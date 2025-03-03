@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Couple Trivia</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1b4b, #2d2673, #3b528b, #2a7049);
+            background-size: 200% 200%;
+            animation: auroraBG 15s ease infinite;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes auroraBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        .container {
+            background: rgba(30, 27, 75, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .card {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+    <div class="stars" id="stars"></div>
+    <div class="container p-6 w-full max-w-lg text-center">
+        <h1 class="text-2xl font-bold mb-4 text-pink-300">Couple Trivia</h1>
+        <p class="mb-2">Skor <span id="name1"></span>: <span id="score1">0</span> | Skor <span id="name2"></span>: <span id="score2">0</span></p>
+        <div id="question" class="card text-white p-4 mb-4"></div>
+        <div id="options" class="options-grid mb-4"></div>
+        <div id="result" class="mb-4 text-lg"></div>
+        <button id="checkBtn" class="bg-blue-400 text-white p-2 rounded hover:bg-blue-500 mb-2 w-full">Cek Jawaban</button>
+        <button id="nextBtn" class="bg-green-400 text-white p-2 rounded hover:bg-green-500 mb-2 w-full hidden">Pertanyaan Berikutnya</button>
+        <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 w-full">Kembali</button>
+    </div>
+    <script>
+        const data = JSON.parse(localStorage.getItem("data"));
+        const name1 = data.name1;
+        const name2 = data.name2;
+
+        const triviaQuestions = [
+            {
+                question: "Kalau pacar jadi kendaraan, kamu pilih yang mana?",
+                options: ["Motor vespa", "Truk kontainer", "Sepeda ontel", "Pesawat kertas"],
+                answer: "Motor vespa",
+                explanation: "Vespa itu klasik, romantis, dan cukup cepet buat kabur bareng!"
+            },
+            {
+                question: "Hewan apa yang paling susah dilupain pas putus?",
+                options: ["Kamerael", "Kamera lelet", "Kamera leon", "Kamera njem duit"],
+                answer: "Kamera lelet",
+                explanation: "Kamera lelet (kamera + lelet = kura-kura) susah move on, jalannya pelan banget!"
+            },
+            {
+                question: "Kalau kencan pertama diadain di planet lain, pilih mana?",
+                options: ["Mars", "Jupiter", "Bumi (curang)", "Pluto yang bukan planet"],
+                answer: "Mars",
+                explanation: "Mars merah kayak hati, romantis abis, tapi jangan lupa bawa oksigen!"
+            },
+            {
+                question: "Alasan paling masuk akal buat telat bales chat?",
+                options: ["Jadi penutup pintu", "Ngejar ayam tetangga", "Lupa cara ngetik", "Jadi superhero"],
+                answer: "Ngejar ayam tetangga",
+                explanation: "Ayam kabur itu bikin panik, wajar dong telat bales!"
+            },
+            {
+                question: "Kalau hujan pas kencan, barang apa yang paling penting dibawa?",
+                options: ["Payung", "Kamera", "Baju renang", "Panci"],
+                answer: "Baju renang",
+                explanation: "Hujan? Jadi ajang pamer skill renang di genangan, kece abis!"
+            }
+        ];
+
+        let currentIndex = 0;
+        let score1 = 0;
+        let score2 = 0;
+        let selectedAnswer1 = null;
+        let selectedAnswer2 = null;
+
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const checkBtn = document.getElementById("checkBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const score1El = document.getElementById("score1");
+        const score2El = document.getElementById("score2");
+        const name1El = document.getElementById("name1");
+        const name2El = document.getElementById("name2");
+
+        name1El.textContent = name1;
+        name2El.textContent = name2;
+
+        function loadQuestion() {
+            const q = triviaQuestions[currentIndex];
+            questionEl.textContent = q.question;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.classList.add("hidden");
+            checkBtn.classList.remove("hidden");
+            selectedAnswer1 = null;
+            selectedAnswer2 = null;
+
+            const options1Div = document.createElement("div");
+            options1Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name1}, pilih jawabanmu:</p>`;
+            q.options.forEach((option) => {
+                const btn = document.createElement("button");
+                btn.textContent = option;
+                btn.classList.add("bg-purple-400", "text-white", "p-2", "rounded", "w-full", "mb-2", "hover:bg-purple-500");
+                btn.onclick = () => selectAnswer(1, option);
+                options1Div.appendChild(btn);
+            });
+
+            const options2Div = document.createElement("div");
+            options2Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name2}, pilih jawabanmu:</p>`;
+            q.options.forEach((option) => {
+                const btn = document.createElement("button");
+                btn.textContent = option;
+                btn.classList.add("bg-purple-400", "text-white", "p-2", "rounded", "w-full", "mb-2", "hover:bg-purple-500");
+                btn.onclick = () => selectAnswer(2, option);
+                options2Div.appendChild(btn);
+            });
+
+            optionsEl.appendChild(options1Div);
+            optionsEl.appendChild(options2Div);
+        }
+
+        function selectAnswer(player, option) {
+            if (player === 1) {
+                selectedAnswer1 = option;
+                resultEl.textContent = `${name1} sudah pilih! Tunggu ${name2} pilih jawaban.`;
+            } else {
+                selectedAnswer2 = option;
+                resultEl.textContent = `${name2} sudah pilih! Klik 'Cek Jawaban' untuk lihat hasil.`;
+            }
+        }
+
+        checkBtn.onclick = () => {
+            const q = triviaQuestions[currentIndex];
+            let resultText = "";
+
+            if (!selectedAnswer1 || !selectedAnswer2) {
+                resultEl.textContent = "Kalian berdua harus pilih jawaban dulu!";
+                return;
+            }
+
+            const isCorrect1 = selectedAnswer1 === q.answer;
+            const isCorrect2 = selectedAnswer2 === q.answer;
+
+            if (isCorrect1 && isCorrect2) {
+                score1 += 1;
+                score2 += 1;
+                resultText = `<span class="text-green-400">Kalian berdua benar!</span> Jawaban: ${q.answer}. ${q.explanation}`;
+            } else if (isCorrect1 && !isCorrect2) {
+                score1 += 1;
+                resultText = `<span class="text-green-400">${name1} benar</span>, <span class="text-red-400">${name2} salah</span>! Jawaban: ${q.answer}. ${q.explanation}`;
+            } else if (!isCorrect1 && isCorrect2) {
+                score2 += 1;
+                resultText = `<span class="text-red-400">${name1} salah</span>, <span class="text-green-400">${name2} benar</span>! Jawaban: ${q.answer}. ${q.explanation}`;
+            } else {
+                resultText = `<span class="text-red-400">Kalian berdua salah!</span> Jawaban: ${q.answer}. ${q.explanation}`;
+            }
+
+            score1El.textContent = score1;
+            score2El.textContent = score2;
+            resultEl.innerHTML = resultText;
+            checkBtn.classList.add("hidden");
+            nextBtn.classList.remove("hidden");
+        };
+
+        nextBtn.onclick = () => {
+            currentIndex = (currentIndex + 1) % triviaQuestions.length;
+            loadQuestion();
+        };
+
+        loadQuestion();
+        const starsContainer = document.getElementById("stars");
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement("div");
+            star.classList.add("star");
+            star.style.width = `${Math.random() * 3}px`;
+            star.style.height = star.style.width;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            starsContainer.appendChild(star);
+        }
+    </script>
+</body>
+</html>

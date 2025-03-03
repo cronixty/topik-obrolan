@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Topik Obrolan</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1b4b, #2d2673, #3b528b, #2a7049);
+            background-size: 200% 200%;
+            animation: auroraBG 15s ease infinite;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes auroraBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        .container {
+            background: rgba(30, 27, 75, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        select {
+            background: #3b528b;
+            color: #fff;
+            border: 1px solid #2a7049;
+            padding: 8px;
+            border-radius: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+    <div class="stars" id="stars"></div>
+    <div class="container p-6 w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-4 text-pink-300">Masukkan Data Pasangan</h1>
+        <form id="zodiacForm">
+            <div class="mb-4">
+                <label class="block text-pink-200">Nama Pasangan 1</label>
+                <input type="text" id="name1" class="w-full p-2 bg-gray-800 text-white border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-pink-200">Tanggal Lahir Pasangan 1</label>
+                <div class="flex gap-2">
+                    <select id="day1" required></select>
+                    <select id="month1" required></select>
+                    <select id="year1" required></select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-pink-200">Nama Pasangan 2</label>
+                <input type="text" id="name2" class="w-full p-2 bg-gray-800 text-white border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-pink-200">Tanggal Lahir Pasangan 2</label>
+                <div class="flex gap-2">
+                    <select id="day2" required></select>
+                    <select id="month2" required></select>
+                    <select id="year2" required></select>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-pink-500 text-white p-2 rounded hover:bg-pink-600">Lanjut</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        const starsContainer = document.getElementById("stars");
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement("div");
+            star.classList.add("star");
+            star.style.width = `${Math.random() * 3}px`;
+            star.style.height = star.style.width;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            starsContainer.appendChild(star);
+        }
+
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const currentYear = new Date().getFullYear();
+
+        function populateDateSelectors(dayId, monthId, yearId) {
+            const daySelect = document.getElementById(dayId);
+            const monthSelect = document.getElementById(monthId);
+            const yearSelect = document.getElementById(yearId);
+
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+
+            months.forEach((month, index) => {
+                const option = document.createElement("option");
+                option.value = index + 1;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+
+            for (let i = currentYear; i >= currentYear - 100; i--) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        populateDateSelectors("day1", "month1", "year1");
+        populateDateSelectors("day2", "month2", "year2");
+    </script>
+</body>
+</html>
