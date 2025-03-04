@@ -50,43 +50,60 @@
         .hidden {
             display: none;
         }
-        .options-grid {
+        .survey-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .survey-box {
+            background: #3b528b;
+            border: 1px solid #2a7049;
+            border-radius: 5px;
+            padding: 0.5rem;
+            text-align: left;
+            min-height: 40px;
+        }
+        .input-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
+            margin-bottom: 1rem;
+        }
+        #result.wrong {
+            color: #ff6b6b;
+            animation: fadeShake 0.5s ease;
+        }
+        @keyframes fadeShake {
+            0% { opacity: 0; transform: translateX(0); }
+            25% { opacity: 1; transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { opacity: 1; transform: translateX(0); }
         }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
     <div class="stars" id="stars"></div>
-    <div class="container p-6 w-full max-w-lg text-center">
+    <div class="container p-6 w-full max-w-md text-center">
         <h1 class="text-2xl font-bold mb-4 text-pink-300">Survei Membuktikan</h1>
-        <div id="level1" class="mb-4">
-            <p class="mb-2">Level 1 - Skor <span id="name1"></span>: <span id="score1">0</span> | Skor <span id="name2"></span>: <span id="score2">0</span></p>
-            <div id="question1" class="card text-white p-4 mb-4"></div>
-            <div id="options1" class="options-grid mb-4"></div>
-            <div id="result1" class="mb-4 text-lg"></div>
-            <button id="checkBtn1" class="bg-blue-400 text-white p-2 rounded hover:bg-blue-500 mb-2 w-full">Cek Jawaban</button>
-            <button id="nextBtn1" class="bg-green-400 text-white p-2 rounded hover:bg-green-500 mb-2 w-full hidden">Pertanyaan Berikutnya</button>
+        <p class="mb-2">Skor <span id="name1"></span>: <span id="score1">0</span> | Skor <span id="name2"></span>: <span id="score2">0</span></p>
+        <p class="mb-2">Giliran: <span id="turn"></span></p>
+        <div id="question" class="card text-white p-4 mb-4"></div>
+        <div class="survey-list" id="surveyList">
+            <div class="survey-box" id="box1">1. ???</div>
+            <div class="survey-box" id="box2">2. ???</div>
+            <div class="survey-box" id="box3">3. ???</div>
+            <div class="survey-box" id="box4">4. ???</div>
+            <div class="survey-box" id="box5">5. ???</div>
         </div>
-        <div id="level2" class="mb-4 hidden">
-            <p class="mb-2">Level 2 - Skor <span id="name1L2"></span>: <span id="score1L2">0</span> | Skor <span id="name2L2"></span>: <span id="score2L2">0</span></p>
-            <div id="question2" class="card text-white p-4 mb-4"></div>
-            <div id="timer" class="mb-2 text-lg"></div>
-            <button id="startTimer" class="bg-yellow-400 text-white p-2 rounded hover:bg-yellow-500 mb-2 w-full">Pertanyaan Baru</button>
-            <div class="options-grid mb-4">
-                <div>
-                    <input id="answer1" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Jawaban Pasangan 1" disabled>
-                </div>
-                <div>
-                    <input id="answer2" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Jawaban Pasangan 2" disabled>
-                </div>
-            </div>
-            <div id="result2" class="mb-4 text-lg"></div>
-            <button id="checkBtn2" class="bg-blue-400 text-white p-2 rounded hover:bg-blue-500 mb-2 w-full hidden">Cek Jawaban</button>
-            <button id="nextBtn2" class="bg-green-400 text-white p-2 rounded hover:bg-green-500 mb-2 w-full hidden">Pertanyaan Baru</button>
+        <div class="input-grid">
+            <input id="input1" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Input Pasangan 1" disabled>
+            <input id="input2" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Input Pasangan 2" disabled>
         </div>
-        <button onclick="toggleLevel()" id="switchLevel" class="bg-purple-400 text-white p-2 rounded hover:bg-purple-500 mb-2 w-full">Ganti ke Level 2</button>
+        <div id="result" class="mb-4 text-lg"></div>
+        <button id="giveUpBtn" class="bg-red-400 text-white p-2 rounded hover:bg-red-500 mb-2 w-full">Menyerah</button>
+        <button id="nextBtn" class="bg-green-400 text-white p-2 rounded hover:bg-green-500 mb-2 w-full hidden">Pertanyaan Berikutnya</button>
         <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 w-full">Kembali</button>
     </div>
     <script>
@@ -94,246 +111,173 @@
         const name1 = data.name1;
         const name2 = data.name2;
 
-        const surveyQuestionsLevel1 = [
+        const surveyQuestions = [
             {
                 question: "Makanan apa yang paling disukai pasangan?",
-                options: ["Pizza", "Sushi", "Burger", "Nasi Goreng"],
-                answer: "Pizza",
-                percentage: 45,
-                reason: "Pizza populer karena praktis dan cocok untuk berbagai selera."
+                answers: [
+                    { text: "Pizza", percentage: 45, revealed: false },
+                    { text: "Sushi", percentage: 25, revealed: false },
+                    { text: "Burger", percentage: 15, revealed: false },
+                    { text: "Nasi Goreng", percentage: 10, revealed: false },
+                    { text: "Mie Ayam", percentage: 5, revealed: false }
+                ],
+                reason: "Pizza jadi nomor satu karena praktis, enak, dan cocok untuk berbagai selera."
             },
             {
                 question: "Liburan romantis paling diimpikan?",
-                options: ["Pantai", "Gunung", "Kota", "Desa"],
-                answer: "Pantai",
-                percentage: 60,
-                reason: "Pantai jadi favorit karena suasana santai dan pemandangan indah."
+                answers: [
+                    { text: "Pantai", percentage: 60, revealed: false },
+                    { text: "Gunung", percentage: 20, revealed: false },
+                    { text: "Kota", percentage: 10, revealed: false },
+                    { text: "Desa", percentage: 5, revealed: false },
+                    { text: "Pulau", percentage: 5, revealed: false }
+                ],
+                reason: "Pantai unggul karena suasana santai, pemandangan indah, dan romantis."
             }
         ];
 
-        const surveyQuestionsLevel2 = [
-            {
-                question: "Apa hadiah ulang tahun terbaik menurut survei?",
-                answer: "Cokelat",
-                percentage: 38,
-                reason: "Cokelat disukai karena murah, manis, dan universal."
-            },
-            {
-                question: "Film genre apa yang paling sering ditonton pasangan?",
-                answer: "Romansa",
-                percentage: 52,
-                reason: "Romansa populer karena bikin hati bergetar dan relatable."
-            }
-        ];
-
-        let currentIndex1 = 0;
-        let currentIndex2 = 0;
-        let score1 = 0, score2 = 0;
-        let score1L2 = 0, score2L2 = 0;
-        let selectedAnswer1 = null, selectedAnswer2 = null;
-        let answer1L2 = "", answer2L2 = "";
+        let currentIndex = 0;
+        let currentPlayer = 1;
+        let score1 = 0;
+        let score2 = 0;
+        let p1Found = false;
+        let p2Found = false;
+        let p1WrongCount = 0;
+        let p2WrongCount = 0;
 
         const name1El = document.getElementById("name1");
         const name2El = document.getElementById("name2");
         const score1El = document.getElementById("score1");
         const score2El = document.getElementById("score2");
-        const question1El = document.getElementById("question1");
-        const options1El = document.getElementById("options1");
-        const result1El = document.getElementById("result1");
-        const checkBtn1 = document.getElementById("checkBtn1");
-        const nextBtn1 = document.getElementById("nextBtn1");
-
-        const name1L2El = document.getElementById("name1L2");
-        const name2L2El = document.getElementById("name2L2");
-        const score1L2El = document.getElementById("score1L2");
-        const score2L2El = document.getElementById("score2L2");
-        const question2El = document.getElementById("question2");
-        const timerEl = document.getElementById("timer");
-        const startTimerBtn = document.getElementById("startTimer");
-        const answer1El = document.getElementById("answer1");
-        const answer2El = document.getElementById("answer2");
-        const result2El = document.getElementById("result2");
-        const checkBtn2 = document.getElementById("checkBtn2");
-        const nextBtn2 = document.getElementById("nextBtn2");
+        const turnEl = document.getElementById("turn");
+        const questionEl = document.getElementById("question");
+        const surveyList = document.getElementById("surveyList");
+        const input1 = document.getElementById("input1");
+        const input2 = document.getElementById("input2");
+        const resultEl = document.getElementById("result");
+        const giveUpBtn = document.getElementById("giveUpBtn");
+        const nextBtn = document.getElementById("nextBtn");
 
         name1El.textContent = name1;
         name2El.textContent = name2;
-        name1L2El.textContent = name1;
-        name2L2El.textContent = name2;
 
-        // Level 1
-        function loadQuestionLevel1() {
-            const q = surveyQuestionsLevel1[currentIndex1];
-            question1El.textContent = q.question;
-            options1El.innerHTML = "";
-            result1El.textContent = "";
-            nextBtn1.classList.add("hidden");
-            checkBtn1.classList.remove("hidden");
-            selectedAnswer1 = null;
-            selectedAnswer2 = null;
-
-            const options1Div = document.createElement("div");
-            options1Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name1}, pilih jawabanmu:</p>`;
-            q.options.forEach((option) => {
-                const btn = document.createElement("button");
-                btn.textContent = option;
-                btn.classList.add("bg-purple-400", "text-white", "p-2", "rounded", "w-full", "mb-2", "hover:bg-purple-500");
-                btn.onclick = () => selectAnswer(1, option);
-                options1Div.appendChild(btn);
-            });
-
-            const options2Div = document.createElement("div");
-            options2Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name2}, pilih jawabanmu:</p>`;
-            q.options.forEach((option) => {
-                const btn = document.createElement("button");
-                btn.textContent = option;
-                btn.classList.add("bg-purple-400", "text-white", "p-2", "rounded", "w-full", "mb-2", "hover:bg-purple-500");
-                btn.onclick = () => selectAnswer(2, option);
-                options2Div.appendChild(btn);
-            });
-
-            options1El.appendChild(options1Div);
-            options1El.appendChild(options2Div);
-        }
-
-        function selectAnswer(player, option) {
-            if (player === 1) {
-                selectedAnswer1 = option;
-                result1El.textContent = selectedAnswer2 ? "Klik 'Cek Jawaban'" : `Tunggu ${name2} pilih jawaban.`;
-            } else {
-                selectedAnswer2 = option;
-                result1El.textContent = selectedAnswer1 ? "Klik 'Cek Jawaban'" : `Tunggu ${name1} pilih jawaban.`;
+        function loadQuestion() {
+            const q = surveyQuestions[currentIndex];
+            questionEl.textContent = q.question;
+            turnEl.textContent = name1;
+            resultEl.textContent = "";
+            giveUpBtn.classList.remove("hidden");
+            nextBtn.classList.add("hidden");
+            currentPlayer = 1;
+            p1Found = false;
+            p2Found = false;
+            p1WrongCount = 0;
+            p2WrongCount = 0;
+            input1.disabled = false;
+            input2.disabled = true;
+            input1.value = "";
+            input2.value = "";
+            for (let i = 0; i < 5; i++) {
+                const box = document.getElementById(`box${i + 1}`);
+                box.textContent = q.answers[i].revealed ? `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)` : `${i + 1}. ???`;
             }
         }
 
-        checkBtn1.onclick = () => {
-            const q = surveyQuestionsLevel1[currentIndex1];
-            let resultText = "";
+        function checkInput(player, input) {
+            const q = surveyQuestions[currentIndex];
+            const guess = input.value.trim().toLowerCase();
+            let found = false;
 
-            if (!selectedAnswer1 || !selectedAnswer2) {
-                result1El.textContent = "Kalian berdua harus pilih jawaban dulu!";
-                return;
-            }
-
-            const isCorrect1 = selectedAnswer1 === q.answer;
-            const isCorrect2 = selectedAnswer2 === q.answer;
-
-            if (isCorrect1 && isCorrect2) {
-                score1 += 1;
-                score2 += 1;
-                resultText = `<span class="text-green-400">Kalian berdua benar!</span> Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else if (isCorrect1 && !isCorrect2) {
-                score1 += 1;
-                resultText = `<span class="text-green-400">${name1} benar</span>, <span class="text-red-400">${name2} salah</span>! Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else if (!isCorrect1 && isCorrect2) {
-                score2 += 1;
-                resultText = `<span class="text-red-400">${name1} salah</span>, <span class="text-green-400">${name2} benar</span>! Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else {
-                resultText = `<span class="text-red-400">Kalian berdua salah!</span> Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            }
-
-            score1El.textContent = score1;
-            score2El.textContent = score2;
-            result1El.innerHTML = resultText;
-            checkBtn1.classList.add("hidden");
-            nextBtn1.classList.remove("hidden");
-        };
-
-        nextBtn1.onclick = () => {
-            currentIndex1 = (currentIndex1 + 1) % surveyQuestionsLevel1.length;
-            loadQuestionLevel1();
-        };
-
-        // Level 2
-        function loadQuestionLevel2() {
-            question2El.textContent = "Klik 'Pertanyaan Baru' untuk mulai!";
-            result2El.textContent = "";
-            nextBtn2.classList.add("hidden");
-            checkBtn2.classList.add("hidden");
-            startTimerBtn.classList.remove("hidden");
-            answer1El.value = "";
-            answer2El.value = "";
-            answer1El.disabled = true;
-            answer2El.disabled = true;
-            timerEl.textContent = "";
-        }
-
-        startTimerBtn.onclick = () => {
-            const q = surveyQuestionsLevel2[currentIndex2];
-            question2El.textContent = q.question;
-            startTimerBtn.classList.add("hidden");
-
-            let timeLeft = 5; // Ganti ke 10 kalau mau lebih lama
-            timerEl.textContent = `Waktu: ${timeLeft} detik`;
-            answer1El.disabled = false;
-            answer2El.disabled = false;
-
-            const timer = setInterval(() => {
-                timeLeft--;
-                timerEl.textContent = `Waktu: ${timeLeft} detik`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    timerEl.textContent = "Waktu habis!";
-                    answer1El.disabled = true;
-                    answer2El.disabled = true;
-                    checkBtn2.classList.remove("hidden");
+            for (let i = 0; i < 5; i++) {
+                if (guess === q.answers[i].text.toLowerCase() && !q.answers[i].revealed) {
+                    q.answers[i].revealed = true;
+                    document.getElementById(`box${i + 1}`).textContent = `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)`;
+                    if (player === 1) {
+                        score1 += q.answers[i].percentage;
+                        score1El.textContent = score1;
+                        resultEl.textContent = `${name1} benar! +${q.answers[i].percentage} poin.`;
+                        p1Found = true;
+                        input1.disabled = true;
+                    } else {
+                        score2 += q.answers[i].percentage;
+                        score2El.textContent = score2;
+                        resultEl.textContent = `${name2} benar! +${q.answers[i].percentage} poin.`;
+                        p2Found = true;
+                        input2.disabled = true;
+                    }
+                    found = true;
+                    break;
                 }
-            }, 1000);
-        };
-
-        checkBtn2.onclick = () => {
-            const q = surveyQuestionsLevel2[currentIndex2];
-            answer1L2 = answer1El.value.trim().toLowerCase();
-            answer2L2 = answer2El.value.trim().toLowerCase();
-            let resultText = "";
-
-            const isCorrect1 = answer1L2 === q.answer.toLowerCase();
-            const isCorrect2 = answer2L2 === q.answer.toLowerCase();
-
-            if (isCorrect1 && isCorrect2) {
-                score1L2 += 1;
-                score2L2 += 1;
-                resultText = `<span class="text-green-400">Kalian berdua benar!</span> Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else if (isCorrect1 && !isCorrect2) {
-                score1L2 += 1;
-                resultText = `<span class="text-green-400">${name1} benar</span>, <span class="text-red-400">${name2} salah</span>! Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else if (!isCorrect1 && isCorrect2) {
-                score2L2 += 1;
-                resultText = `<span class="text-red-400">${name1} salah</span>, <span class="text-green-400">${name2} benar</span>! Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
-            } else {
-                resultText = `<span class="text-red-400">Kalian berdua salah!</span> Jawaban: ${q.answer} (${q.percentage}%). Alasan: ${q.reason}`;
             }
 
-            score1L2El.textContent = score1L2;
-            score2L2El.textContent = score2L2;
-            result2El.innerHTML = resultText;
-            checkBtn2.classList.add("hidden");
-            nextBtn2.classList.remove("hidden");
-        };
+            if (!found) {
+                if (player === 1) p1WrongCount++;
+                else p2WrongCount++;
+                const wrongCount = player === 1 ? p1WrongCount : p2WrongCount;
+                resultEl.textContent = "Anda salah! Survei tidak membuktikan.";
+                resultEl.classList.add("wrong");
+                resultEl.style.animation = `fadeShake ${0.5 - (wrongCount * 0.05)}s ease`;
+                setTimeout(() => {
+                    resultEl.classList.remove("wrong");
+                    resultEl.style.animation = "";
+                }, 500 - (wrongCount * 50));
+            }
 
-        nextBtn2.onclick = () => {
-            currentIndex2 = (currentIndex2 + 1) % surveyQuestionsLevel2.length;
-            loadQuestionLevel2();
-        };
-
-        function toggleLevel() {
-            const level1 = document.getElementById("level1");
-            const level2 = document.getElementById("level2");
-            const switchBtn = document.getElementById("switchLevel");
-            if (level1.classList.contains("hidden")) {
-                level1.classList.remove("hidden");
-                level2.classList.add("hidden");
-                switchBtn.textContent = "Ganti ke Level 2";
-                loadQuestionLevel1();
+            input.value = "";
+            if (p1Found && p2Found) {
+                revealAll(q);
+                resultEl.textContent += ` Alasan kolom 1 tertinggi: ${q.reason}`;
+                nextBtn.classList.remove("hidden");
+                giveUpBtn.classList.add("hidden");
+            } else if (!p1Found && !p2Found) {
+                currentPlayer = player === 1 ? 2 : 1;
+                input1.disabled = currentPlayer === 2;
+                input2.disabled = currentPlayer === 1;
+                turnEl.textContent = currentPlayer === 1 ? name1 : name2;
             } else {
-                level1.classList.add("hidden");
-                level2.classList.remove("hidden");
-                switchBtn.textContent = "Ganti ke Level 1";
-                loadQuestionLevel2();
+                currentPlayer = p1Found ? 2 : 1;
+                input1.disabled = currentPlayer === 2;
+                input2.disabled = currentPlayer === 1;
+                turnEl.textContent = currentPlayer === 1 ? name1 : name2;
             }
         }
 
-        loadQuestionLevel1();
+        function revealAll(q) {
+            for (let i = 0; i < 5; i++) {
+                q.answers[i].revealed = true;
+                document.getElementById(`box${i + 1}`).textContent = `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)`;
+            }
+            input1.disabled = true;
+            input2.disabled = true;
+        }
+
+        input1.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && currentPlayer === 1 && !p1Found) {
+                checkInput(1, input1);
+            }
+        });
+
+        input2.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && currentPlayer === 2 && !p2Found) {
+                checkInput(2, input2);
+            }
+        });
+
+        giveUpBtn.onclick = () => {
+            const q = surveyQuestions[currentIndex];
+            revealAll(q);
+            resultEl.textContent = `Kalian menyerah! Alasan kolom 1 tertinggi: ${q.reason}`;
+            giveUpBtn.classList.add("hidden");
+            nextBtn.classList.remove("hidden");
+        };
+
+        nextBtn.onclick = () => {
+            currentIndex = (currentIndex + 1) % surveyQuestions.length;
+            surveyQuestions[currentIndex].answers.forEach(a => a.revealed = false);
+            loadQuestion();
+        };
+
+        loadQuestion();
 
         const starsContainer = document.getElementById("stars");
         for (let i = 0; i < 100; i++) {
