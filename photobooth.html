@@ -116,7 +116,11 @@
         let stream;
         let photos = [];
         const templateImg = new Image();
-        templateImg.src = "./strip_template.png"; // Sesuaikan path ke file template kamu
+        // Ganti dengan URL raw dari GitHub
+        templateImg.src = "https://raw.githubusercontent.com/nama-anda/photobooth-assets/main/strip_template.png";
+
+        // Tambah crossOrigin buat CORS
+        templateImg.crossOrigin = "Anonymous";
 
         // Akses kamera
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -150,13 +154,13 @@
         function loadTemplate() {
             return new Promise((resolve, reject) => {
                 templateImg.onload = () => {
-                    console.log("Template loaded successfully");
+                    console.log("Template loaded successfully from GitHub");
                     resolve(templateImg);
                 };
                 templateImg.onerror = () => {
-                    console.error("Failed to load template");
-                    reject(new Error("Gagal load template strip! Pastikan file 'strip_template.png' ada di folder yang benar."));
-                };
+                    console.error("Failed to load template from GitHub");
+                    reject(new Error("Gagal load template strip dari GitHub! Pastikan URL 'https://raw.githubusercontent.com/nama-anda/photobooth-assets/main/strip_template.png' benar dan file ada."));
+                });
             });
         }
 
@@ -207,7 +211,7 @@
         // Render strip dengan template
         function renderStrip(template) {
             const ctx = stripCanvas.getContext("2d");
-            ctx.drawImage(template, 0, 0, 150, 360); // Template eksternal
+            ctx.drawImage(template, 0, 0, 150, 360); // Template dari GitHub
             ctx.drawImage(photos[0], 10, 10, 130, 80);  // Foto 1
             ctx.drawImage(photos[1], 10, 95, 130, 80);  // Foto 2
             ctx.drawImage(photos[2], 10, 180, 130, 80); // Foto 3
