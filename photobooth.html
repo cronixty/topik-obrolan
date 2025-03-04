@@ -95,8 +95,8 @@
     </div>
     <script>
         const data = JSON.parse(localStorage.getItem("data"));
-        const name1 = data.name1;
-        const name2 = data.name2;
+        const name1 = data ? data.name1 : "Pasangan 1";
+        const name2 = data ? data.name2 : "Pasangan 2";
 
         const video = document.getElementById("video");
         const startBtn = document.getElementById("start");
@@ -116,21 +116,23 @@
         let stream;
         let photos = [];
         const templateImg = new Image();
-        // Ganti dengan URL raw dari GitHub
+        // Ganti dengan URL raw GitHub kamu
         templateImg.src = "https://raw.githubusercontent.com/cronixty/foto/main/strip_template.png";
-
-        // Tambah crossOrigin buat CORS
         templateImg.crossOrigin = "Anonymous";
 
         // Akses kamera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(s => {
-                stream = s;
+        async function initCamera() {
+            try {
+                console.log("Mencoba akses kamera...");
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
-            })
-            .catch(err => {
-                alert("Gagal akses kamera: " + err.message);
-            });
+                console.log("Kamera berhasil diakses!");
+            } catch (err) {
+                console.error("Gagal akses kamera:", err);
+                alert("Gagal akses kamera: " + err.message + ". Pastikan izinkan kamera di browser dan website diakses via HTTPS.");
+            }
+        }
+        initCamera();
 
         // Ambil foto
         function takePhoto() {
@@ -159,8 +161,8 @@
                 };
                 templateImg.onerror = () => {
                     console.error("Failed to load template from GitHub");
-                    reject(new Error("Gagal load template strip dari GitHub! Pastikan URL 'https://raw.githubusercontent.com/nama-anda/photobooth-assets/main/strip_template.png' benar dan file ada."));
-                });
+                    reject(new Error("Gagal load template strip dari GitHub! Cek URL: " + templateImg.src));
+                };
             });
         }
 
@@ -188,6 +190,10 @@
         }
 
         startBtn.onclick = async () => {
+            if (!stream) {
+                alert("Kamera belum siap! Tunggu sebentar atau refresh halaman.");
+                return;
+            }
             photos = [];
             startBtn.disabled = true;
             await countdownAndSnap(1, () => {});
@@ -211,22 +217,18 @@
         // Render strip dengan template
         function renderStrip(template) {
             const ctx = stripCanvas.getContext("2d");
-            ctx.drawImage(template, 0, 0, 150, 360); // Template dari GitHub
-            ctx.drawImage(photos[0], 10, 10, 130, 80);  // Foto 1
-            ctx.drawImage(photos[1], 10, 95, 130, 80);  // Foto 2
-            ctx.drawImage(photos[2], 10, 180, 130, 80); // Foto 3
-            ctx.drawImage(photos[3], 10, 265, 130, 80); // Foto 4
+            ctx.drawImage(template, 0, 0, 150, 360);
+            ctx.drawImage(photos[0], 10, 10, 130, 80);
+            ctx.drawImage(photos[1], 10, 95, 130, 80);
+            ctx.drawImage(photos[2], 10, 180, 130, 80);
+            ctx.drawImage(photos[3], 10, 265, 130, 80);
         }
 
         // Ulang foto
         retry.onclick = () => {
             cameraContainer.classList.remove("hidden");
             resultContainer.classList.add("hidden");
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(s => {
-                    stream = s;
-                    video.srcObject = stream;
-                });
+            initCamera();
         };
 
         // Simpan strip
