@@ -98,8 +98,8 @@
             <div class="survey-box" id="box5">5. ???</div>
         </div>
         <div class="input-grid">
-            <input id="input1" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Input Pasangan 1" disabled>
-            <input id="input2" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="Input Pasangan 2" disabled>
+            <input id="input1" class="w-full p-2 bg-gray-800 text-white border rounded" disabled>
+            <input id="input2" class="w-full p-2 bg-gray-800 text-white border rounded" disabled>
         </div>
         <div id="result" class="mb-4 text-lg"></div>
         <button id="giveUpBtn" class="bg-red-400 text-white p-2 rounded hover:bg-red-500 mb-2 w-full">Menyerah</button>
@@ -160,6 +160,8 @@
 
         name1El.textContent = name1;
         name2El.textContent = name2;
+        input1.placeholder = name1; // Placeholder jadi nama pasangan 1
+        input2.placeholder = name2; // Placeholder jadi nama pasangan 2
 
         function loadQuestion() {
             const q = surveyQuestions[currentIndex];
