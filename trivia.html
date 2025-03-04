@@ -167,10 +167,10 @@
         function selectAnswer(player, option) {
             if (player === 1) {
                 selectedAnswer1 = option;
-                resultEl.textContent = `${name1} sudah pilih! Tunggu ${name2} pilih jawaban.`;
+                resultEl.textContent = selectedAnswer2 ? "Klik 'Cek Jawaban'" : `Tunggu ${name2} pilih jawaban.`;
             } else {
                 selectedAnswer2 = option;
-                resultEl.textContent = `${name2} sudah pilih! Klik 'Cek Jawaban' untuk lihat hasil.`;
+                resultEl.textContent = selectedAnswer1 ? "Klik 'Cek Jawaban'" : `Tunggu ${name1} pilih jawaban.`;
             }
         }
 
