@@ -129,16 +129,17 @@
                 console.log("Kamera berhasil diakses!");
             } catch (err) {
                 console.error("Gagal akses kamera:", err);
-                alert("Gagal akses kamera: " + err.message + ". Pastikan izinkan kamera di browser dan website diakses via HTTPS.");
+                alert("Gagal akses kamera: " + err.message + ". Pastikan izinkan kamera di browser dan akses via HTTPS.");
             }
         }
         initCamera();
 
         // Ambil foto
         function takePhoto() {
+            console.log("Mengambil foto...");
             const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 240;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             return canvas;
@@ -146,6 +147,7 @@
 
         // Animasi flash
         function flash() {
+            console.log("Flash!");
             flashEl.style.animation = "flashEffect 0.2s ease";
             setTimeout(() => {
                 flashEl.style.animation = "";
@@ -160,17 +162,18 @@
                     resolve(templateImg);
                 };
                 templateImg.onerror = () => {
-                    console.error("Failed to load template from GitHub");
+                    console.error("Failed to load template from GitHub:", templateImg.src);
                     reject(new Error("Gagal load template strip dari GitHub! Cek URL: " + templateImg.src));
                 };
             });
         }
 
         // Hitung mundur dan potret
-        function countdownAndSnap(count, callback) {
+        function countdownAndSnap(count) {
             return new Promise(resolve => {
                 let timeLeft = 5;
                 countdownEl.textContent = timeLeft;
+                console.log(`Hitung mundur untuk foto ${count}: ${timeLeft}`);
                 const timer = setInterval(() => {
                     timeLeft--;
                     countdownEl.textContent = timeLeft;
@@ -181,7 +184,7 @@
                             const photo = takePhoto();
                             photos.push(photo);
                             countdownEl.textContent = "";
-                            callback();
+                            console.log(`Foto ${count} diambil`);
                             resolve();
                         }, 200);
                     }
@@ -196,36 +199,44 @@
             }
             photos = [];
             startBtn.disabled = true;
-            await countdownAndSnap(1, () => {});
-            await countdownAndSnap(2, () => {});
-            await countdownAndSnap(3, () => {});
-            await countdownAndSnap(4, async () => {
-                try {
-                    const template = await loadTemplate();
-                    renderStrip(template);
-                    cameraContainer.classList.add("hidden");
-                    resultContainer.classList.remove("hidden");
-                    stream.getTracks().forEach(track => track.stop());
-                } catch (err) {
-                    alert(err.message);
-                } finally {
-                    startBtn.disabled = false;
-                }
-            });
+            console.log("Mulai pengambilan foto...");
+            await countdownAndSnap(1);
+            await countdownAndSnap(2);
+            await countdownAndSnap(3);
+            await countdownAndSnap(4);
+
+            console.log("Semua foto diambil, render strip...");
+            try {
+                const template = await loadTemplate();
+                renderStrip(template);
+                console.log("Strip dirender, transisi ke hasil...");
+                cameraContainer.classList.add("hidden");
+                resultContainer.classList.remove("hidden");
+                stream.getTracks().forEach(track => track.stop());
+            } catch (err) {
+                console.error("Error saat render strip:", err);
+                alert(err.message);
+            } finally {
+                startBtn.disabled = false;
+            }
         };
 
         // Render strip dengan template
         function renderStrip(template) {
             const ctx = stripCanvas.getContext("2d");
+            console.log("Menggambar template ke canvas...");
             ctx.drawImage(template, 0, 0, 150, 360);
+            console.log("Menggambar foto ke canvas...");
             ctx.drawImage(photos[0], 10, 10, 130, 80);
             ctx.drawImage(photos[1], 10, 95, 130, 80);
             ctx.drawImage(photos[2], 10, 180, 130, 80);
             ctx.drawImage(photos[3], 10, 265, 130, 80);
+            console.log("Selesai render strip!");
         }
 
         // Ulang foto
         retry.onclick = () => {
+            console.log("Mengulang sesi foto...");
             cameraContainer.classList.remove("hidden");
             resultContainer.classList.add("hidden");
             initCamera();
@@ -233,6 +244,7 @@
 
         // Simpan strip
         save.onclick = () => {
+            console.log("Menyimpan strip...");
             const link = document.createElement("a");
             link.download = `${name1}_${name2}_fotobox.png`;
             link.href = stripCanvas.toDataURL("image/png");
