@@ -46,16 +46,17 @@
             flex-direction: column;
             gap: 0.5rem;
             max-height: 100vh;
-            overflow-y: auto;
+            overflow-y: auto; /* Izinin scroll */
         }
         .strip-container {
-            width: 300px;
-            height: 600px; /* Naik biar muat 4 foto */
+            width: 200px; /* Ramping kayak fotobox */
+            height: auto; /* Tinggi fleksibel */
             margin: 0 auto;
+            max-height: 100vh;
+            overflow-y: auto; /* Scroll kalau ga muat */
         }
         #stripCanvas {
             width: 100%;
-            height: 100%;
         }
         #cameraContainer {
             position: relative;
@@ -100,6 +101,9 @@
             align-items: center;
             gap: 0.3rem;
         }
+        #video {
+            transform: scaleX(-1); /* Matikan mirror di CSS */
+        }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
@@ -138,7 +142,7 @@
         </div>
         <div id="resultContainer" class="hidden mb-1">
             <div class="strip-container">
-                <canvas id="stripCanvas" width="300" height="600"></canvas>
+                <canvas id="stripCanvas"></canvas>
             </div>
             <p class="mt-1 text-sm"><span id="name1"></span> & <span id="name2"></span></p>
             <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
@@ -175,12 +179,16 @@
         let stream;
         let photos = [];
 
-        // Akses kamera dengan resolusi 1080p
+        // Akses kamera tanpa mirror
         async function initCamera() {
             try {
                 console.log("Mencoba akses kamera...");
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: { ideal: 1920 }, height: { ideal: 1080 } } 
+                    video: { 
+                        width: { ideal: 1920 }, 
+                        height: { ideal: 1080 }, 
+                        facingMode: "user" // Pastikan ga mirror
+                    } 
                 });
                 video.srcObject = stream;
                 console.log("Kamera berhasil diakses! Resolusi:", video.videoWidth, "x", video.videoHeight);
@@ -249,7 +257,7 @@
             }
 
             console.log("Semua foto diambil, render strip...");
-            customOptions.classList.add("hidden"); // Sembunyikan custom options
+            customOptions.style.display = "none"; // Hilangkan custom options
             renderStrip();
             console.log("Strip dirender, pindah ke hasil...");
             cameraContainer.classList.add("hidden");
@@ -263,28 +271,36 @@
         function renderStrip() {
             const ctx = stripCanvas.getContext("2d");
 
+            // Hitung tinggi strip berdasarkan 4 foto
+            const photoWidth = 150; // Ramping kayak fotobox
+            const photoHeight = photoWidth * (video.videoHeight / video.videoWidth); // ≈ 84px buat 16:9
+            const spacing = 10;
+            const totalHeight = (4 * photoHeight) + (3 * spacing) + 40; // Tambah padding atas-bawah
+            stripCanvas.width = 200;
+            stripCanvas.height = totalHeight;
+
             // Background strip (custom warna)
             ctx.fillStyle = stripColorInput.value;
-            ctx.fillRect(0, 0, 300, 600);
+            ctx.fillRect(0, 0, 200, totalHeight);
 
             // Pola samping (custom tipe dan warna)
             ctx.fillStyle = patternColorInput.value;
             const pattern = patternTypeSelect.value;
-            for (let y = 20; y < 600; y += 60) {
-                if (pattern === "star") drawStar(ctx, 15, y, 10, 5);
-                else if (pattern === "heart") drawHeart(ctx, 15, y, 10);
-                else if (pattern === "circle") drawCircle(ctx, 15, y, 10);
-                if (pattern === "star") drawStar(ctx, 285, y, 10, 5);
-                else if (pattern === "heart") drawHeart(ctx, 285, y, 10);
-                else if (pattern === "circle") drawCircle(ctx, 285, y, 10);
+            for (let y = 20; y < totalHeight; y += 60) {
+                if (pattern === "star") drawStar(ctx, 10, y, 8, 5);
+                else if (pattern === "heart") drawHeart(ctx, 10, y, 8);
+                else if (pattern === "circle") drawCircle(ctx, 10, y, 8);
+                if (pattern === "star") drawStar(ctx, 190, y, 8, 5);
+                else if (pattern === "heart") drawHeart(ctx, 190, y, 8);
+                else if (pattern === "circle") drawCircle(ctx, 190, y, 8);
             }
 
             // Pernak-pernik (custom tipe dan warna)
             ctx.fillStyle = confettiColorInput.value;
             const confetti = confettiTypeSelect.value;
             for (let i = 0; i < 30; i++) {
-                const x = Math.random() * 40 + (Math.random() < 0.5 ? 0 : 260);
-                const y = Math.random() * 600;
+                const x = Math.random() * 30 + (Math.random() < 0.5 ? 0 : 170);
+                const y = Math.random() * totalHeight;
                 if (confetti === "circle") drawCircle(ctx, x, y, 5);
                 else if (confetti === "square") drawSquare(ctx, x, y, 8);
                 else if (confetti === "star") drawStar(ctx, x, y, 8, 5);
@@ -292,15 +308,11 @@
 
             // Tempel foto (proporsional dengan spasi)
             console.log("Menggambar foto...");
-            const photoWidth = 200;
-            const photoHeight = photoWidth * (video.videoHeight / video.videoWidth); // ≈ 112px buat 16:9
-            const spacing = 10;
-            const totalHeight = (4 * photoHeight) + (3 * spacing); // 4 foto + 3 spasi
-            const startY = (600 - totalHeight) / 2; // Tengahin
-            ctx.drawImage(photos[0], 50, startY, photoWidth, photoHeight);
-            ctx.drawImage(photos[1], 50, startY + photoHeight + spacing, photoWidth, photoHeight);
-            ctx.drawImage(photos[2], 50, startY + (photoHeight + spacing) * 2, photoWidth, photoHeight);
-            ctx.drawImage(photos[3], 50, startY + (photoHeight + spacing) * 3, photoWidth, photoHeight);
+            const startY = 20; // Mulai dari atas + padding
+            ctx.drawImage(photos[0], 25, startY, photoWidth, photoHeight);
+            ctx.drawImage(photos[1], 25, startY + photoHeight + spacing, photoWidth, photoHeight);
+            ctx.drawImage(photos[2], 25, startY + (photoHeight + spacing) * 2, photoWidth, photoHeight);
+            ctx.drawImage(photos[3], 25, startY + (photoHeight + spacing) * 3, photoWidth, photoHeight);
         }
 
         // Fungsi gambar pola
@@ -336,7 +348,7 @@
         // Ulang foto
         retry.onclick = () => {
             console.log("Mengulang sesi foto...");
-            customOptions.classList.remove("hidden"); // Tampilkan lagi custom options
+            customOptions.style.display = "flex"; // Tampilkan lagi custom options
             cameraContainer.classList.remove("hidden");
             resultContainer.classList.add("hidden");
             initCamera();
