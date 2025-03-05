@@ -41,15 +41,16 @@
             background: rgba(30, 27, 75, 0.8);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            height: 100vh;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 1rem;
+            gap: 0.5rem;
+            max-height: 100vh;
+            overflow-y: auto;
         }
         .strip-container {
-            width: 400px; /* Naik buat HD, rasio 16:9 */
-            height: 720px; /* 1080p scaled down */
+            width: 300px; /* Kecilin dari 400px */
+            height: 540px; /* Kecilin dari 720px */
             margin: 0 auto;
         }
         #stripCanvas {
@@ -96,47 +97,45 @@
     <div class="stars" id="stars"></div>
     <div id="flash"></div>
     <div class="container w-full max-w-md text-center">
-        <div>
-            <h1 class="text-xl font-bold mb-2 text-pink-300">Foto Studio</h1>
-            <div class="custom-options">
-                <div class="custom-option">
-                    <label class="text-xs">Warna Strip:</label>
-                    <input type="color" id="stripColor" value="#ff6b6b" class="w-8 h-8 rounded">
-                </div>
-                <div class="custom-option">
-                    <label class="text-xs">Pola:</label>
-                    <select id="patternType" class="bg-gray-800 text-white text-xs p-1 rounded">
-                        <option value="star">Bintang</option>
-                        <option value="heart">Hati</option>
-                        <option value="circle">Lingkaran</option>
-                    </select>
-                    <input type="color" id="patternColor" value="#ffcccb" class="w-8 h-8 rounded">
-                </div>
-                <div class="custom-option">
-                    <label class="text-xs">Pernak:</label>
-                    <select id="confettiType" class="bg-gray-800 text-white text-xs p-1 rounded">
-                        <option value="circle">Lingkaran</option>
-                        <option value="square">Kotak</option>
-                        <option value="star">Bintang</option>
-                    </select>
-                    <input type="color" id="confettiColor" value="#ffd700" class="w-8 h-8 rounded">
-                </div>
+        <h1 class="text-xl font-bold mb-1 text-pink-300">Foto Studio</h1>
+        <div class="custom-options">
+            <div class="custom-option">
+                <label class="text-xs">Warna Strip:</label>
+                <input type="color" id="stripColor" value="#ff6b6b" class="w-8 h-8 rounded">
             </div>
-            <div id="cameraContainer" class="mb-2 relative">
-                <video id="video" width="240" height="180" autoplay class="rounded-lg mb-1"></video>
-                <div id="countdown" class="mb-1"></div>
-                <button id="start" class="bg-blue-400 text-white p-1 rounded hover:bg-blue-500 w-full text-sm">Mulai Foto</button>
+            <div class="custom-option">
+                <label class="text-xs">Pola:</label>
+                <select id="patternType" class="bg-gray-800 text-white text-xs p-1 rounded">
+                    <option value="star">Bintang</option>
+                    <option value="heart">Hati</option>
+                    <option value="circle">Lingkaran</option>
+                </select>
+                <input type="color" id="patternColor" value="#ffcccb" class="w-8 h-8 rounded">
             </div>
-            <div id="resultContainer" class="hidden mb-2">
-                <div class="strip-container">
-                    <canvas id="stripCanvas" width="400" height="720"></canvas>
-                </div>
-                <p class="mt-1 text-sm"><span id="name1"></span> & <span id="name2"></span></p>
-                <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
-                <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
+            <div class="custom-option">
+                <label class="text-xs">Pernak:</label>
+                <select id="confettiType" class="bg-gray-800 text-white text-xs p-1 rounded">
+                    <option value="circle">Lingkaran</option>
+                    <option value="square">Kotak</option>
+                    <option value="star">Bintang</option>
+                </select>
+                <input type="color" id="confettiColor" value="#ffd700" class="w-8 h-8 rounded">
             </div>
         </div>
-        <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-2">Kembali</button>
+        <div id="cameraContainer" class="mb-1 relative">
+            <video id="video" width="320" height="240" autoplay class="rounded-lg mb-1"></video>
+            <div id="countdown" class="mb-1"></div>
+            <button id="start" class="bg-blue-400 text-white p-1 rounded hover:bg-blue-500 w-full text-sm">Mulai Foto</button>
+        </div>
+        <div id="resultContainer" class="hidden mb-1">
+            <div class="strip-container">
+                <canvas id="stripCanvas" width="300" height="540"></canvas>
+            </div>
+            <p class="mt-1 text-sm"><span id="name1"></span> & <span id="name2"></span></p>
+            <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
+            <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
+        </div>
+        <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm">Kembali</button>
     </div>
     <script>
         const data = JSON.parse(localStorage.getItem("data"));
@@ -249,44 +248,44 @@
             console.log("Sesi foto selesai.");
         };
 
-        // Render strip dengan custom design dan resolusi HD
+        // Render strip dengan custom design dan ukuran lebih kecil
         function renderStrip() {
             const ctx = stripCanvas.getContext("2d");
 
             // Background strip (custom warna)
             ctx.fillStyle = stripColorInput.value;
-            ctx.fillRect(0, 0, 400, 720);
+            ctx.fillRect(0, 0, 300, 540);
 
             // Pola samping (custom tipe dan warna)
             ctx.fillStyle = patternColorInput.value;
             const pattern = patternTypeSelect.value;
-            for (let y = 20; y < 720; y += 80) {
-                if (pattern === "star") drawStar(ctx, 20, y, 15, 5);
-                else if (pattern === "heart") drawHeart(ctx, 20, y, 15);
-                else if (pattern === "circle") drawCircle(ctx, 20, y, 15);
-                if (pattern === "star") drawStar(ctx, 380, y, 15, 5);
-                else if (pattern === "heart") drawHeart(ctx, 380, y, 15);
-                else if (pattern === "circle") drawCircle(ctx, 380, y, 15);
+            for (let y = 20; y < 540; y += 60) {
+                if (pattern === "star") drawStar(ctx, 15, y, 10, 5);
+                else if (pattern === "heart") drawHeart(ctx, 15, y, 10);
+                else if (pattern === "circle") drawCircle(ctx, 15, y, 10);
+                if (pattern === "star") drawStar(ctx, 285, y, 10, 5);
+                else if (pattern === "heart") drawHeart(ctx, 285, y, 10);
+                else if (pattern === "circle") drawCircle(ctx, 285, y, 10);
             }
 
             // Pernak-pernik (custom tipe dan warna)
             ctx.fillStyle = confettiColorInput.value;
             const confetti = confettiTypeSelect.value;
-            for (let i = 0; i < 40; i++) {
-                const x = Math.random() * 60 + (Math.random() < 0.5 ? 0 : 340);
-                const y = Math.random() * 720;
-                if (confetti === "circle") drawCircle(ctx, x, y, 8);
-                else if (confetti === "square") drawSquare(ctx, x, y, 10);
-                else if (confetti === "star") drawStar(ctx, x, y, 10, 5);
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * 40 + (Math.random() < 0.5 ? 0 : 260);
+                const y = Math.random() * 540;
+                if (confetti === "circle") drawCircle(ctx, x, y, 5);
+                else if (confetti === "square") drawSquare(ctx, x, y, 8);
+                else if (confetti === "star") drawStar(ctx, x, y, 8, 5);
             }
 
-            // Tempel foto (proporsional dengan spasi, HD)
+            // Tempel foto (proporsional, lebih kecil, dengan spasi)
             console.log("Menggambar foto...");
-            const photoWidth = 300; // Lebar lebih besar buat HD
-            const photoHeight = photoWidth * (video.videoHeight / video.videoWidth);
-            const spacing = 15; // Spasi lebih besar
+            const photoWidth = 200; // Kecilin dari 300px
+            const photoHeight = photoWidth * (video.videoHeight / video.videoWidth); // ≈ 112px buat 16:9
+            const spacing = 10;
             const totalHeight = (4 * photoHeight) + (3 * spacing);
-            const startY = (720 - totalHeight) / 2; // Tengahin
+            const startY = (540 - totalHeight) / 2; // Tengahin
             ctx.drawImage(photos[0], 50, startY, photoWidth, photoHeight);
             ctx.drawImage(photos[1], 50, startY + photoHeight + spacing, photoWidth, photoHeight);
             ctx.drawImage(photos[2], 50, startY + (photoHeight + spacing) * 2, photoWidth, photoHeight);
