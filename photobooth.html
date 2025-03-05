@@ -42,18 +42,14 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
             max-height: 100vh;
-            overflow-y: auto; /* Izinin scroll */
+            overflow-y: auto; /* Scroll aktif */
         }
         .strip-container {
-            width: 200px; /* Ramping kayak fotobox */
-            height: auto; /* Tinggi fleksibel */
-            margin: 0 auto;
-            max-height: 100vh;
+            width: 200px;
+            max-height: 100vh; /* Batasi tinggi layar */
             overflow-y: auto; /* Scroll kalau ga muat */
+            margin: 0 auto;
         }
         #stripCanvas {
             width: 100%;
@@ -95,6 +91,7 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             justify-content: center;
+            margin-bottom: 0.5rem;
         }
         .custom-option {
             display: flex;
@@ -102,7 +99,7 @@
             gap: 0.3rem;
         }
         #video {
-            transform: scaleX(-1); /* Matikan mirror di CSS */
+            transform: scaleX(-1); /* Matikan mirror */
         }
     </style>
 </head>
@@ -148,7 +145,7 @@
             <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
             <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
         </div>
-        <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm">Kembali</button>
+        <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1">Kembali</button>
     </div>
     <script>
         const data = JSON.parse(localStorage.getItem("data"));
@@ -187,7 +184,7 @@
                     video: { 
                         width: { ideal: 1920 }, 
                         height: { ideal: 1080 }, 
-                        facingMode: "user" // Pastikan ga mirror
+                        facingMode: "user" 
                     } 
                 });
                 video.srcObject = stream;
@@ -272,10 +269,10 @@
             const ctx = stripCanvas.getContext("2d");
 
             // Hitung tinggi strip berdasarkan 4 foto
-            const photoWidth = 150; // Ramping kayak fotobox
+            const photoWidth = 150;
             const photoHeight = photoWidth * (video.videoHeight / video.videoWidth); // ≈ 84px buat 16:9
             const spacing = 10;
-            const totalHeight = (4 * photoHeight) + (3 * spacing) + 40; // Tambah padding atas-bawah
+            const totalHeight = (4 * photoHeight) + (3 * spacing) + 40; // Padding atas-bawah
             stripCanvas.width = 200;
             stripCanvas.height = totalHeight;
 
@@ -308,7 +305,7 @@
 
             // Tempel foto (proporsional dengan spasi)
             console.log("Menggambar foto...");
-            const startY = 20; // Mulai dari atas + padding
+            const startY = 20;
             ctx.drawImage(photos[0], 25, startY, photoWidth, photoHeight);
             ctx.drawImage(photos[1], 25, startY + photoHeight + spacing, photoWidth, photoHeight);
             ctx.drawImage(photos[2], 25, startY + (photoHeight + spacing) * 2, photoWidth, photoHeight);
