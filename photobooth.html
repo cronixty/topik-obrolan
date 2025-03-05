@@ -43,12 +43,15 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             padding: 1rem;
             max-height: 100vh;
-            overflow-y: auto; /* Scroll aktif */
+            min-height: 101vh; /* Pastikan scroll aktif */
+            overflow-y: scroll; /* Paksa scroll */
+            scroll-behavior: smooth; /* Smooth scroll */
+            -webkit-overflow-scrolling: touch; /* Smooth di mobile */
         }
         .strip-container {
             width: 200px;
-            max-height: 100vh; /* Batasi tinggi layar */
-            overflow-y: auto; /* Scroll kalau ga muat */
+            max-height: 100vh;
+            overflow-y: auto;
             margin: 0 auto;
         }
         #stripCanvas {
@@ -99,7 +102,7 @@
             gap: 0.3rem;
         }
         #video {
-            transform: scaleX(-1); /* Matikan mirror */
+            transform: scaleX(-1);
         }
     </style>
 </head>
@@ -254,7 +257,7 @@
             }
 
             console.log("Semua foto diambil, render strip...");
-            customOptions.style.display = "none"; // Hilangkan custom options
+            customOptions.style.display = "none";
             renderStrip();
             console.log("Strip dirender, pindah ke hasil...");
             cameraContainer.classList.add("hidden");
@@ -345,7 +348,7 @@
         // Ulang foto
         retry.onclick = () => {
             console.log("Mengulang sesi foto...");
-            customOptions.style.display = "flex"; // Tampilkan lagi custom options
+            customOptions.style.display = "flex";
             cameraContainer.classList.remove("hidden");
             resultContainer.classList.add("hidden");
             initCamera();
