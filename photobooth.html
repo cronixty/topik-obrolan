@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -43,7 +43,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         .strip-container {
-            width: 200px; /* Lebar naik biar muat pola */
+            width: 200px;
             height: 360px;
             margin: 0 auto;
         }
@@ -71,6 +71,9 @@
             10% { opacity: 1; }
             100% { opacity: 0; }
         }
+        .custom-options {
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
@@ -78,6 +81,25 @@
     <div id="flash"></div>
     <div class="container p-6 w-full max-w-md text-center">
         <h1 class="text-2xl font-bold mb-4 text-pink-300">Foto Studio</h1>
+        <div class="custom-options">
+            <label>Warna Strip: <input type="color" id="stripColor" value="#ff6b6b"></label><br>
+            <label>Pola Samping: 
+                <select id="patternType">
+                    <option value="star">Bintang</option>
+                    <option value="heart">Hati</option>
+                    <option value="circle">Lingkaran</option>
+                </select>
+                <input type="color" id="patternColor" value="#ffcccb">
+            </label><br>
+            <label>Pernak-Pernik: 
+                <select id="confettiType">
+                    <option value="circle">Lingkaran</option>
+                    <option value="square">Kotak</option>
+                    <option value="star">Bintang</option>
+                </select>
+                <input type="color" id="confettiColor" value="#ffd700">
+            </label>
+        </div>
         <div id="cameraContainer" class="mb-4 relative">
             <video id="video" width="320" height="240" autoplay class="rounded-lg mb-2"></video>
             <div id="countdown" class="mb-2"></div>
@@ -109,17 +131,17 @@
         const save = document.getElementById("save");
         const name1El = document.getElementById("name1");
         const name2El = document.getElementById("name2");
+        const stripColorInput = document.getElementById("stripColor");
+        const patternTypeSelect = document.getElementById("patternType");
+        const patternColorInput = document.getElementById("patternColor");
+        const confettiTypeSelect = document.getElementById("confettiType");
+        const confettiColorInput = document.getElementById("confettiColor");
 
         name1El.textContent = name1;
         name2El.textContent = name2;
 
         let stream;
         let photos = [];
-
-        // Custom settings (ubah di sini sesuai selera)
-        const stripColor = "linear-gradient(45deg, #ff6b6b, #4ecdc4)"; // Warna strip
-        const patternColor = "#ffcccb"; // Warna pola samping
-        const confettiColor = "#ffd700"; // Warna pernak-pernik
 
         // Akses kamera
         async function initCamera() {
@@ -206,28 +228,31 @@
         function renderStrip() {
             const ctx = stripCanvas.getContext("2d");
 
-            // Background strip
-            const gradient = ctx.createLinearGradient(0, 0, 200, 360);
-            gradient.addColorStop(0, "#ff6b6b"); // Custom warna awal
-            gradient.addColorStop(1, "#4ecdc4"); // Custom warna akhir
-            ctx.fillStyle = gradient; // Bisa ganti ke ctx.fillStyle = "#hex" buat solid
+            // Background strip (custom warna)
+            ctx.fillStyle = stripColorInput.value;
             ctx.fillRect(0, 0, 200, 360);
 
-            // Pola lucu di samping (bintang)
-            ctx.fillStyle = patternColor;
+            // Pola samping (custom tipe dan warna)
+            ctx.fillStyle = patternColorInput.value;
+            const pattern = patternTypeSelect.value;
             for (let y = 10; y < 360; y += 40) {
-                drawStar(ctx, 20, y, 10, 5); // Samping kiri
-                drawStar(ctx, 180, y, 10, 5); // Samping kanan
+                if (pattern === "star") drawStar(ctx, 20, y, 10, 5);
+                else if (pattern === "heart") drawHeart(ctx, 20, y, 10);
+                else if (pattern === "circle") drawCircle(ctx, 20, y, 10);
+                if (pattern === "star") drawStar(ctx, 180, y, 10, 5);
+                else if (pattern === "heart") drawHeart(ctx, 180, y, 10);
+                else if (pattern === "circle") drawCircle(ctx, 180, y, 10);
             }
 
-            // Taburan pernak-pernik (confetti)
-            ctx.fillStyle = confettiColor;
+            // Pernak-pernik (custom tipe dan warna)
+            ctx.fillStyle = confettiColorInput.value;
+            const confetti = confettiTypeSelect.value;
             for (let i = 0; i < 20; i++) {
-                const x = Math.random() * 40 + (Math.random() < 0.5 ? 0 : 160); // Kiri/kanan
+                const x = Math.random() * 40 + (Math.random() < 0.5 ? 0 : 160);
                 const y = Math.random() * 360;
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fill();
+                if (confetti === "circle") drawCircle(ctx, x, y, 3);
+                else if (confetti === "square") drawSquare(ctx, x, y, 5);
+                else if (confetti === "star") drawStar(ctx, x, y, 5, 5);
             }
 
             // Tempel foto
@@ -238,19 +263,34 @@
             ctx.drawImage(photos[3], 35, 265, 130, 80);
         }
 
-        // Fungsi gambar bintang
+        // Fungsi gambar pola
         function drawStar(ctx, x, y, r, points) {
             ctx.beginPath();
             for (let i = 0; i < points * 2; i++) {
                 const angle = (Math.PI / points) * i;
                 const radius = i % 2 === 0 ? r : r / 2;
-                ctx.lineTo(
-                    x + radius * Math.cos(angle),
-                    y + radius * Math.sin(angle)
-                );
+                ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
             }
             ctx.closePath();
             ctx.fill();
+        }
+
+        function drawHeart(ctx, x, y, size) {
+            ctx.beginPath();
+            ctx.moveTo(x, y + size / 4);
+            ctx.quadraticCurveTo(x - size / 2, y - size / 2, x, y - size);
+            ctx.quadraticCurveTo(x + size / 2, y - size / 2, x + size, y + size / 4);
+            ctx.fill();
+        }
+
+        function drawCircle(ctx, x, y, r) {
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawSquare(ctx, x, y, size) {
+            ctx.fillRect(x - size / 2, y - size / 2, size, size);
         }
 
         // Ulang foto
