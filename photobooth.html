@@ -43,8 +43,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         .strip-container {
-            width: 200px;
-            height: 360px;
+            width: 300px; /* Naik buat HD */
+            height: 540px; /* Naik buat HD */
             margin: 0 auto;
         }
         #stripCanvas {
@@ -72,7 +72,16 @@
             100% { opacity: 0; }
         }
         .custom-options {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
             margin-bottom: 1rem;
+        }
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
@@ -82,32 +91,37 @@
     <div class="container p-6 w-full max-w-md text-center">
         <h1 class="text-2xl font-bold mb-4 text-pink-300">Foto Studio</h1>
         <div class="custom-options">
-            <label>Warna Strip: <input type="color" id="stripColor" value="#ff6b6b"></label><br>
-            <label>Pola Samping: 
-                <select id="patternType">
+            <div class="custom-option">
+                <label class="text-sm">Warna Strip:</label>
+                <input type="color" id="stripColor" value="#ff6b6b" class="w-10 h-10 rounded">
+            </div>
+            <div class="custom-option">
+                <label class="text-sm">Pola Samping:</label>
+                <select id="patternType" class="bg-gray-800 text-white p-1 rounded">
                     <option value="star">Bintang</option>
                     <option value="heart">Hati</option>
                     <option value="circle">Lingkaran</option>
                 </select>
-                <input type="color" id="patternColor" value="#ffcccb">
-            </label><br>
-            <label>Pernak-Pernik: 
-                <select id="confettiType">
+                <input type="color" id="patternColor" value="#ffcccb" class="w-10 h-10 rounded">
+            </div>
+            <div class="custom-option">
+                <label class="text-sm">Pernak-Pernik:</label>
+                <select id="confettiType" class="bg-gray-800 text-white p-1 rounded">
                     <option value="circle">Lingkaran</option>
                     <option value="square">Kotak</option>
                     <option value="star">Bintang</option>
                 </select>
-                <input type="color" id="confettiColor" value="#ffd700">
-            </label>
+                <input type="color" id="confettiColor" value="#ffd700" class="w-10 h-10 rounded">
+            </div>
         </div>
         <div id="cameraContainer" class="mb-4 relative">
-            <video id="video" width="320" height="240" autoplay class="rounded-lg mb-2"></video>
+            <video id="video" width="640" height="480" autoplay class="rounded-lg mb-2"></video>
             <div id="countdown" class="mb-2"></div>
             <button id="start" class="bg-blue-400 text-white p-2 rounded hover:bg-blue-500 w-full">Mulai Foto</button>
         </div>
         <div id="resultContainer" class="hidden mb-4">
             <div class="strip-container">
-                <canvas id="stripCanvas" width="200" height="360"></canvas>
+                <canvas id="stripCanvas" width="300" height="540"></canvas>
             </div>
             <p class="mt-2"><span id="name1"></span> & <span id="name2"></span></p>
             <button id="retry" class="bg-yellow-400 text-white p-2 rounded hover:bg-yellow-500 mt-2 w-full">Ulang</button>
@@ -143,11 +157,13 @@
         let stream;
         let photos = [];
 
-        // Akses kamera
+        // Akses kamera dengan resolusi lebih tinggi
         async function initCamera() {
             try {
                 console.log("Mencoba akses kamera...");
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 } } 
+                });
                 video.srcObject = stream;
                 console.log("Kamera berhasil diakses!");
             } catch (err) {
@@ -157,12 +173,12 @@
         }
         initCamera();
 
-        // Ambil foto
+        // Ambil foto dengan resolusi tinggi
         function takePhoto() {
             console.log("Mengambil foto...");
             const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth || 320;
-            canvas.height = video.videoHeight || 240;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             return canvas;
@@ -224,43 +240,43 @@
             console.log("Sesi foto selesai.");
         };
 
-        // Render strip dengan custom design
+        // Render strip dengan custom design (resolusi HD)
         function renderStrip() {
             const ctx = stripCanvas.getContext("2d");
 
             // Background strip (custom warna)
             ctx.fillStyle = stripColorInput.value;
-            ctx.fillRect(0, 0, 200, 360);
+            ctx.fillRect(0, 0, 300, 540);
 
             // Pola samping (custom tipe dan warna)
             ctx.fillStyle = patternColorInput.value;
             const pattern = patternTypeSelect.value;
-            for (let y = 10; y < 360; y += 40) {
-                if (pattern === "star") drawStar(ctx, 20, y, 10, 5);
-                else if (pattern === "heart") drawHeart(ctx, 20, y, 10);
-                else if (pattern === "circle") drawCircle(ctx, 20, y, 10);
-                if (pattern === "star") drawStar(ctx, 180, y, 10, 5);
-                else if (pattern === "heart") drawHeart(ctx, 180, y, 10);
-                else if (pattern === "circle") drawCircle(ctx, 180, y, 10);
+            for (let y = 15; y < 540; y += 60) {
+                if (pattern === "star") drawStar(ctx, 30, y, 15, 5);
+                else if (pattern === "heart") drawHeart(ctx, 30, y, 15);
+                else if (pattern === "circle") drawCircle(ctx, 30, y, 15);
+                if (pattern === "star") drawStar(ctx, 270, y, 15, 5);
+                else if (pattern === "heart") drawHeart(ctx, 270, y, 15);
+                else if (pattern === "circle") drawCircle(ctx, 270, y, 15);
             }
 
             // Pernak-pernik (custom tipe dan warna)
             ctx.fillStyle = confettiColorInput.value;
             const confetti = confettiTypeSelect.value;
-            for (let i = 0; i < 20; i++) {
-                const x = Math.random() * 40 + (Math.random() < 0.5 ? 0 : 160);
-                const y = Math.random() * 360;
-                if (confetti === "circle") drawCircle(ctx, x, y, 3);
-                else if (confetti === "square") drawSquare(ctx, x, y, 5);
-                else if (confetti === "star") drawStar(ctx, x, y, 5, 5);
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * 60 + (Math.random() < 0.5 ? 0 : 240);
+                const y = Math.random() * 540;
+                if (confetti === "circle") drawCircle(ctx, x, y, 5);
+                else if (confetti === "square") drawSquare(ctx, x, y, 8);
+                else if (confetti === "star") drawStar(ctx, x, y, 8, 5);
             }
 
-            // Tempel foto
+            // Tempel foto (HD)
             console.log("Menggambar foto...");
-            ctx.drawImage(photos[0], 35, 10, 130, 80);
-            ctx.drawImage(photos[1], 35, 95, 130, 80);
-            ctx.drawImage(photos[2], 35, 180, 130, 80);
-            ctx.drawImage(photos[3], 35, 265, 130, 80);
+            ctx.drawImage(photos[0], 55, 15, 195, 120); // Naik dari 130x80 ke 195x120
+            ctx.drawImage(photos[1], 55, 142.5, 195, 120);
+            ctx.drawImage(photos[2], 55, 270, 195, 120);
+            ctx.drawImage(photos[3], 55, 397.5, 195, 120);
         }
 
         // Fungsi gambar pola
@@ -306,7 +322,7 @@
             console.log("Menyimpan strip...");
             const link = document.createElement("a");
             link.download = `${name1}_${name2}_fotobox.png`;
-            link.href = stripCanvas.toDataURL("image/png");
+            link.href = stripCanvas.toDataURL("image/png", 1.0); // Kualitas maksimum
             link.click();
         };
 
