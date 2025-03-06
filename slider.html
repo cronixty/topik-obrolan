@@ -52,16 +52,16 @@
             max-width: 800px;
             height: 80%;
             overflow-x: hidden;
-            position: relative;
+            position: related;
             cursor: pointer;
             margin: 0 auto;
             user-select: none;
-            -webkit-user-drag: none; /* Optimasi untuk browser */
+            -webkit-user-drag: none;
         }
         .swiper-wrapper {
             display: flex;
             height: 100%;
-            will-change: transform; /* Optimasi performa */
+            will-change: transform;
         }
         .swiper-slide {
             flex: 0 0 100%;
@@ -72,7 +72,7 @@
             padding: 1rem;
             opacity: 0.5;
             transform: scale(0.9);
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
         .swiper-slide.active {
             opacity: 1;
@@ -84,7 +84,7 @@
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            pointer-events: none; /* Mencegah interaksi gambar */
+            pointer-events: none;
         }
         @media (min-width: 1024px) {
             .swiper-container {
@@ -114,15 +114,9 @@
         
         // Daftar nama file di folder media (sesuaikan dengan nama file Anda)
         const mediaFiles = [
-            "1.png",
-            "2.png",
-            "3.png",
-            "4.png",
-            "5.png",
-            "6.png",
-            "7.png",
-            "8.png",
-            "9.png"
+            "foto1.jpg",
+            "foto2.png",
+            "foto3.jpeg"
         ];
 
         // Gabungkan base path dengan nama file
@@ -135,8 +129,6 @@
         let startX = 0;
         let currentTranslate = 0;
         let prevTranslate = 0;
-        let velocity = 0; // Kecepatan untuk inertia
-        let lastMoveTime = 0;
 
         // Muat media lokal ke swiper
         function loadMedia() {
@@ -155,7 +147,7 @@
                 slide.appendChild(img);
                 swiperWrapper.appendChild(slide);
             });
-            updateSwiper();
+            updateSwiper(false);
         }
 
         // Update posisi swiper dan kelas aktif
@@ -177,46 +169,11 @@
             }
         }
 
-        // Animasi inertia saat swipe dilepas
-        function animateInertia() {
-            if (!isDragging && Math.abs(velocity) > 0.1) {
-                currentTranslate += velocity;
-                velocity *= 0.95; // Gesekan untuk memperlambat
-
-                const slideWidth = swiperWrapper.children[0].offsetWidth;
-                const maxTranslate = 0;
-                const minTranslate = -(localMedia.length - 1) * slideWidth;
-
-                if (currentTranslate > maxTranslate) {
-                    currentTranslate = maxTranslate;
-                    velocity = 0;
-                } else if (currentTranslate < minTranslate) {
-                    currentTranslate = minTranslate;
-                    velocity = 0;
-                }
-
-                swiperWrapper.style.transform = `translateX(${currentTranslate}px)`;
-                requestAnimationFrame(animateInertia);
-            } else if (!isDragging) {
-                snapToNearestSlide();
-            }
-        }
-
-        // Snap ke slide terdekat
-        function snapToNearestSlide() {
-            const slideWidth = swiperWrapper.children[0].offsetWidth;
-            currentIndex = Math.round(-currentTranslate / slideWidth);
-            currentIndex = Math.max(0, Math.min(currentIndex, localMedia.length - 1));
-            updateSwiper(true);
-        }
-
-        // Touch events untuk mobile (swipe smooth)
+        // Touch events untuk mobile (swipe smooth tanpa inertia berlebihan)
         swiperContainer.addEventListener("touchstart", e => {
             isDragging = true;
             startX = e.touches[0].clientX;
             prevTranslate = currentTranslate;
-            velocity = 0;
-            lastMoveTime = Date.now();
             swiperWrapper.style.transition = "none";
         });
 
@@ -224,19 +181,35 @@
             if (isDragging) {
                 const currentX = e.touches[0].clientX;
                 const diff = currentX - startX;
-                const now = Date.now();
-                const deltaTime = (now - lastMoveTime) / 1000; // Dalam detik
-                velocity = (diff - (currentTranslate - prevTranslate)) / deltaTime; // Hitung kecepatan
                 currentTranslate = prevTranslate + diff;
+
+                // Batasi geseran agar tidak terlalu jauh
+                const slideWidth = swiperWrapper.children[0].offsetWidth;
+                const maxTranslate = 0;
+                const minTranslate = -(localMedia.length - 1) * slideWidth;
+                currentTranslate = Math.max(minTranslate, Math.min(maxTranslate, currentTranslate));
+
                 swiperWrapper.style.transform = `translateX(${currentTranslate}px)`;
-                lastMoveTime = now;
             }
         });
 
         swiperContainer.addEventListener("touchend", e => {
             if (isDragging) {
                 isDragging = false;
-                requestAnimationFrame(animateInertia);
+                swiperWrapper.style.transition = "transform 0.3s ease-out";
+
+                const slideWidth = swiperWrapper.children[0].offsetWidth;
+                const diff = e.changedTouches[0].clientX - startX;
+                const threshold = slideWidth / 3; // Threshold 33% untuk geser
+
+                if (Math.abs(diff) > threshold) {
+                    if (diff < 0 && currentIndex < localMedia.length - 1) {
+                        currentIndex++;
+                    } else if (diff > 0 && currentIndex > 0) {
+                        currentIndex--;
+                    }
+                }
+                updateSwiper(true);
             }
         });
 
