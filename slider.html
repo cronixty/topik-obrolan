@@ -45,18 +45,20 @@
             align-items: center;
             background: rgba(30, 27, 75, 0.8);
             padding: 1rem;
+            width: 100%;
         }
         .swiper-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             height: 80%;
             overflow-x: hidden;
             position: relative;
             cursor: grab;
+            margin: 0 auto;
         }
         .swiper-wrapper {
             display: flex;
-            transition: transform 0.3s ease;
+            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); /* Animasi halus */
             height: 100%;
         }
         .swiper-slide {
@@ -66,18 +68,34 @@
             justify-content: center;
             align-items: center;
             padding: 1rem;
+            opacity: 0.5; /* Default opacity rendah untuk slide non-aktif */
+            transform: scale(0.9); /* Default scale kecil */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* Transisi untuk opacity dan scale */
+        }
+        .swiper-slide.active {
+            opacity: 1; /* Slide aktif full opacity */
+            transform: scale(1); /* Slide aktif full size */
         }
         .swiper-slide img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Tambah bayangan untuk efek depth */
+        }
+        @media (min-width: 1024px) {
+            .swiper-container {
+                max-width: 1000px;
+            }
+            .swiper-slide img {
+                max-width: 80%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
-    <div class="container w-full max-w-md">
+    <div class="container">
         <div class="swiper-container" id="swiperContainer">
             <div class="swiper-wrapper" id="swiperWrapper">
                 <!-- Media lokal akan dimuat di sini -->
@@ -93,8 +111,9 @@
         
         // Daftar nama file di folder media (sesuaikan dengan nama file Anda)
         const mediaFiles = [
-            "1.png",
-            "2.png",
+            "foto1.jpg",
+            "foto2.png",
+            "foto3.jpeg"
         ];
 
         // Gabungkan base path dengan nama file
@@ -106,23 +125,34 @@
 
         // Muat media lokal ke swiper
         function loadMedia() {
+            console.log("Memuat media dari:", localMedia);
             localMedia.forEach(url => {
                 const slide = document.createElement("div");
                 slide.classList.add("swiper-slide");
                 const img = document.createElement("img");
                 img.src = url;
                 img.alt = "Media Lokal";
-                img.onerror = () => img.src = 'https://via.placeholder.com/400x600?text=Image+Not+Found'; // Fallback image
+                img.onerror = () => {
+                    console.error("Gagal memuat:", url);
+                    img.src = 'https://via.placeholder.com/400x600?text=Image+Not+Found';
+                };
+                img.onload = () => console.log("Berhasil memuat:", url);
                 slide.appendChild(img);
                 swiperWrapper.appendChild(slide);
             });
-            updateSwiper();
+            updateSwiper(); // Panggil pertama kali untuk set slide aktif
         }
 
-        // Update posisi swiper
+        // Update posisi swiper dan kelas aktif
         function updateSwiper() {
             const slideWidth = swiperWrapper.children[0].offsetWidth;
             swiperWrapper.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+
+            // Tambah/kurangi kelas 'active' untuk animasi
+            const slides = swiperWrapper.children;
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.toggle("active", i === currentIndex);
+            }
         }
 
         // Touch events untuk mobile
