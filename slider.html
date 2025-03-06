@@ -80,7 +80,7 @@
     <div class="container w-full max-w-md">
         <div class="swiper-container" id="swiperContainer">
             <div class="swiper-wrapper" id="swiperWrapper">
-                <!-- Media eksternal akan dimuat di sini -->
+                <!-- Media lokal akan dimuat di sini -->
             </div>
         </div>
         <div class="mt-4">
@@ -88,24 +88,31 @@
         </div>
     </div>
     <script>
-        // Media eksternal (gunakan URL direct dari Google Drive)
-        const externalMedia = [
-            "https://drive.google.com/uc?export=view&id=1PmizZbKS3hSHib3JvfJmDqujmgDEPPqI",
-            "https://drive.google.com/uc?export=view&id=16r-OZdP0vLmL_WxaQzJ9fkOTSbQ1OBbz",
+        // Definisikan base path folder lokal
+        const baseFolderPath = "media/";
+        
+        // Daftar nama file di folder media
+        const mediaFiles = [
+            "image1.jpg",  // Ganti dengan nama file Anda
+            "image2.jpg",  // Ganti dengan nama file Anda
+            // Tambahkan nama file lain sesuai kebutuhan
         ];
+
+        // Gabungkan base path dengan nama file
+        const localMedia = mediaFiles.map(file => `${baseFolderPath}${file}`);
 
         const swiperWrapper = document.getElementById("swiperWrapper");
         const swiperContainer = document.getElementById("swiperContainer");
         let currentIndex = 0;
 
-        // Muat media eksternal ke swiper
+        // Muat media lokal ke swiper
         function loadMedia() {
-            externalMedia.forEach(url => {
+            localMedia.forEach(url => {
                 const slide = document.createElement("div");
                 slide.classList.add("swiper-slide");
                 const img = document.createElement("img");
                 img.src = url;
-                img.alt = "Media Eksternal";
+                img.alt = "Media Lokal";
                 img.onerror = () => img.src = 'https://via.placeholder.com/400x600?text=Image+Not+Found'; // Fallback image
                 slide.appendChild(img);
                 swiperWrapper.appendChild(slide);
@@ -134,7 +141,7 @@
         swiperContainer.addEventListener("touchend", () => {
             const diff = touchStartX - touchEndX;
             if (Math.abs(diff) > 50) {
-                if (diff > 0 && currentIndex < externalMedia.length - 1) {
+                if (diff > 0 && currentIndex < localMedia.length - 1) {
                     currentIndex++;
                 } else if (diff < 0 && currentIndex > 0) {
                     currentIndex--;
@@ -163,7 +170,7 @@
             if (isDragging) {
                 const diff = mouseStartX - e.clientX;
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0 && currentIndex < externalMedia.length - 1) {
+                    if (diff > 0 && currentIndex < localMedia.length - 1) {
                         currentIndex++;
                     } else if (diff < 0 && currentIndex > 0) {
                         currentIndex--;
