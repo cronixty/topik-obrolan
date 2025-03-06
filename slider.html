@@ -53,14 +53,14 @@
             height: 80%;
             overflow-x: hidden;
             position: relative;
-            cursor: grab;
+            cursor: pointer; /* Ganti cursor grab jadi pointer */
             margin: 0 auto;
-            user-select: none; /* Mencegah seleksi teks saat drag */
+            user-select: none;
         }
         .swiper-wrapper {
             display: flex;
-            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
             height: 100%;
+            transition: transform 0.3s ease-out;
         }
         .swiper-slide {
             flex: 0 0 100%;
@@ -71,7 +71,7 @@
             padding: 1rem;
             opacity: 0.5;
             transform: scale(0.9);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .swiper-slide.active {
             opacity: 1;
@@ -112,15 +112,9 @@
         
         // Daftar nama file di folder media (sesuaikan dengan nama file Anda)
         const mediaFiles = [
-            "1.png",
-            "2.png",
-            "3.png",
-            "4.png",
-            "5.png",
-            "6.png",
-            "7.png",
-            "8.png",
-            "9.png",
+            "foto1.jpg",
+            "foto2.png",
+            "foto3.jpeg"
         ];
 
         // Gabungkan base path dengan nama file
@@ -130,7 +124,7 @@
         const swiperContainer = document.getElementById("swiperContainer");
         let currentIndex = 0;
         let isDragging = false;
-        let mouseStartX = 0;
+        let startX = 0;
         let currentTranslate = 0;
         let prevTranslate = 0;
 
@@ -158,6 +152,7 @@
         function updateSwiper() {
             const slideWidth = swiperWrapper.children[0].offsetWidth;
             currentTranslate = -currentIndex * slideWidth;
+            prevTranslate = currentTranslate;
             swiperWrapper.style.transform = `translateX(${currentTranslate}px)`;
 
             const slides = swiperWrapper.children;
@@ -166,56 +161,31 @@
             }
         }
 
-        // Touch events untuk mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
-
+        // Touch events untuk mobile (tetap swipe)
         swiperContainer.addEventListener("touchstart", e => {
-            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            prevTranslate = currentTranslate;
+            swiperWrapper.style.transition = "none";
         });
 
         swiperContainer.addEventListener("touchmove", e => {
-            touchEndX = e.touches[0].clientX;
-        });
-
-        swiperContainer.addEventListener("touchend", () => {
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0 && currentIndex < localMedia.length - 1) {
-                    currentIndex++;
-                } else if (diff < 0 && currentIndex > 0) {
-                    currentIndex--;
-                }
-                updateSwiper();
-            }
-        });
-
-        // Mouse events untuk desktop
-        swiperContainer.addEventListener("mousedown", e => {
-            isDragging = true;
-            mouseStartX = e.clientX;
-            prevTranslate = currentTranslate;
-            swiperContainer.style.cursor = "grabbing";
-            swiperWrapper.style.transition = "none"; // Hilangkan transisi saat drag
-        });
-
-        swiperContainer.addEventListener("mousemove", e => {
             if (isDragging) {
-                e.preventDefault();
-                const mouseMoveX = e.clientX;
-                const diff = mouseMoveX - mouseStartX;
+                const currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
                 currentTranslate = prevTranslate + diff;
                 swiperWrapper.style.transform = `translateX(${currentTranslate}px)`;
             }
         });
 
-        swiperContainer.addEventListener("mouseup", e => {
+        swiperContainer.addEventListener("touchend", e => {
             if (isDragging) {
-                const diff = e.clientX - mouseStartX;
+                isDragging = false;
+                swiperWrapper.style.transition = "transform 0.3s ease-out";
                 const slideWidth = swiperWrapper.children[0].offsetWidth;
-                swiperWrapper.style.transition = "transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)"; // Kembalikan transisi
+                const diff = e.changedTouches[0].clientX - startX;
 
-                if (Math.abs(diff) > slideWidth / 4) { // Threshold 25% lebar slide
+                if (Math.abs(diff) > slideWidth / 4) {
                     if (diff < 0 && currentIndex < localMedia.length - 1) {
                         currentIndex++;
                     } else if (diff > 0 && currentIndex > 0) {
@@ -223,18 +193,23 @@
                     }
                 }
                 updateSwiper();
-                isDragging = false;
-                swiperContainer.style.cursor = "grab";
             }
         });
 
-        swiperContainer.addEventListener("mouseleave", () => {
-            if (isDragging) {
-                swiperWrapper.style.transition = "transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)";
-                updateSwiper();
-                isDragging = false;
-                swiperContainer.style.cursor = "grab";
+        // Mouse events untuk desktop (klik saja)
+        swiperContainer.addEventListener("click", e => {
+            const slideWidth = swiperWrapper.children[0].offsetWidth;
+            const clickX = e.clientX - swiperContainer.getBoundingClientRect().left; // Posisi klik relatif ke container
+            const halfWidth = slideWidth / 2;
+
+            if (clickX < halfWidth && currentIndex > 0) {
+                // Klik di sisi kiri, geser ke slide sebelumnya
+                currentIndex--;
+            } else if (clickX > halfWidth && currentIndex < localMedia.length - 1) {
+                // Klik di sisi kanan, geser ke slide berikutnya
+                currentIndex++;
             }
+            updateSwiper();
         });
 
         // Inisialisasi
