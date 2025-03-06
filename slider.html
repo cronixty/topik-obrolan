@@ -52,7 +52,7 @@
             max-width: 800px;
             height: 80%;
             overflow-x: hidden;
-            position: related;
+            position: relative;
             cursor: pointer;
             margin: 0 auto;
             user-select: none;
@@ -175,7 +175,7 @@
             }
         }
 
-        // Touch events untuk mobile (swipe smooth tanpa inertia berlebihan)
+        // Touch events untuk mobile (swipe smooth dengan threshold 20%)
         swiperContainer.addEventListener("touchstart", e => {
             isDragging = true;
             startX = e.touches[0].clientX;
@@ -206,7 +206,7 @@
 
                 const slideWidth = swiperWrapper.children[0].offsetWidth;
                 const diff = e.changedTouches[0].clientX - startX;
-                const threshold = slideWidth / 3; // Threshold 33% untuk geser
+                const threshold = slideWidth / 5; // Threshold 20% untuk geser
 
                 if (Math.abs(diff) > threshold) {
                     if (diff < 0 && currentIndex < localMedia.length - 1) {
