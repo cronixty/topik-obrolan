@@ -206,7 +206,7 @@
 
                 const slideWidth = swiperWrapper.children[0].offsetWidth;
                 const diff = e.changedTouches[0].clientX - startX;
-                const threshold = slideWidth / 5; // Threshold 20% untuk geser
+                const threshold = slideWidth / 6.67; // Threshold 20% untuk geser
 
                 if (Math.abs(diff) > threshold) {
                     if (diff < 0 && currentIndex < localMedia.length - 1) {
