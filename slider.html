@@ -125,9 +125,8 @@
             "9.png"
         ];
 
-        // Array untuk media yang tersedia dan riwayat
-        let availableMedia = [...mediaFiles.map(file => `${baseFolderPath}${file}`)];
-        let history = [];
+        // Gabungkan base path dengan nama file
+        const localMedia = mediaFiles.map(file => `${baseFolderPath}${file}`);
 
         const swiperWrapper = document.getElementById("swiperWrapper");
         const swiperContainer = document.getElementById("swiperContainer");
@@ -137,32 +136,24 @@
         let currentTranslate = 0;
         let prevTranslate = 0;
 
-        // Muat media awal secara random
-        function loadInitialMedia() {
-            if (availableMedia.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableMedia.length);
-                const initialMedia = availableMedia[randomIndex];
-                addSlide(initialMedia);
-                history.push(initialMedia);
-                availableMedia.splice(randomIndex, 1); // Hapus dari availableMedia
-            }
+        // Muat media lokal ke swiper
+        function loadMedia() {
+            console.log("Memuat media dari:", localMedia);
+            localMedia.forEach(url => {
+                const slide = document.createElement("div");
+                slide.classList.add("swiper-slide");
+                const img = document.createElement("img");
+                img.src = url;
+                img.alt = "Media Lokal";
+                img.onerror = () => {
+                    console.error("Gagal memuat:", url);
+                    img.src = 'https://via.placeholder.com/400x600?text=Image+Not+Found';
+                };
+                img.onload = () => console.log("Berhasil memuat:", url);
+                slide.appendChild(img);
+                swiperWrapper.appendChild(slide);
+            });
             updateSwiper(false);
-        }
-
-        // Tambah slide ke swiper
-        function addSlide(url) {
-            const slide = document.createElement("div");
-            slide.classList.add("swiper-slide");
-            const img = document.createElement("img");
-            img.src = url;
-            img.alt = "Media Lokal";
-            img.onerror = () => {
-                console.error("Gagal memuat:", url);
-                img.src = 'https://via.placeholder.com/400x600?text=Image+Not+Found';
-            };
-            img.onload = () => console.log("Berhasil memuat:", url);
-            slide.appendChild(img);
-            swiperWrapper.appendChild(slide);
         }
 
         // Update posisi swiper dan kelas aktif
@@ -184,19 +175,7 @@
             }
         }
 
-        // Pilih media random dari yang belum ditampilkan
-        function getRandomMedia() {
-            if (availableMedia.length === 0) {
-                console.log("Semua media sudah ditampilkan");
-                return null;
-            }
-            const randomIndex = Math.floor(Math.random() * availableMedia.length);
-            const media = availableMedia[randomIndex];
-            availableMedia.splice(randomIndex, 1); // Hapus dari availableMedia
-            return media;
-        }
-
-        // Touch events untuk mobile (swipe dengan random dan history)
+        // Touch events untuk mobile (swipe smooth dengan threshold 20%)
         swiperContainer.addEventListener("touchstart", e => {
             isDragging = true;
             startX = e.touches[0].clientX;
@@ -210,9 +189,10 @@
                 const diff = currentX - startX;
                 currentTranslate = prevTranslate + diff;
 
+                // Batasi geseran agar tidak terlalu jauh
                 const slideWidth = swiperWrapper.children[0].offsetWidth;
                 const maxTranslate = 0;
-                const minTranslate = -(swiperWrapper.children.length - 1) * slideWidth;
+                const minTranslate = -(localMedia.length - 1) * slideWidth;
                 currentTranslate = Math.max(minTranslate, Math.min(maxTranslate, currentTranslate));
 
                 swiperWrapper.style.transform = `translateX(${currentTranslate}px)`;
@@ -226,17 +206,12 @@
 
                 const slideWidth = swiperWrapper.children[0].offsetWidth;
                 const diff = e.changedTouches[0].clientX - startX;
-                const threshold = slideWidth / 5; // Threshold 20%
+                const threshold = slideWidth / 5; // Threshold 20% untuk geser
 
                 if (Math.abs(diff) > threshold) {
-                    if (diff < 0 && availableMedia.length > 0) { // Geser ke kiri (random baru)
-                        const newMedia = getRandomMedia();
-                        if (newMedia) {
-                            addSlide(newMedia);
-                            history.push(newMedia);
-                            currentIndex++;
-                        }
-                    } else if (diff > 0 && currentIndex > 0) { // Geser ke kanan (kembali ke sebelumnya)
+                    if (diff < 0 && currentIndex < localMedia.length - 1) {
+                        currentIndex++;
+                    } else if (diff > 0 && currentIndex > 0) {
                         currentIndex--;
                     }
                 }
@@ -244,27 +219,22 @@
             }
         });
 
-        // Mouse events untuk desktop (klik dengan random dan history)
+        // Mouse events untuk desktop (klik saja)
         swiperContainer.addEventListener("click", e => {
             const slideWidth = swiperWrapper.children[0].offsetWidth;
             const clickX = e.clientX - swiperContainer.getBoundingClientRect().left;
             const halfWidth = slideWidth / 2;
 
-            if (clickX < halfWidth && currentIndex > 0) { // Klik kiri (kembali)
+            if (clickX < halfWidth && currentIndex > 0) {
                 currentIndex--;
-            } else if (clickX > halfWidth && availableMedia.length > 0) { // Klik kanan (random baru)
-                const newMedia = getRandomMedia();
-                if (newMedia) {
-                    addSlide(newMedia);
-                    history.push(newMedia);
-                    currentIndex++;
-                }
+            } else if (clickX > halfWidth && currentIndex < localMedia.length - 1) {
+                currentIndex++;
             }
             updateSwiper(true);
         });
 
         // Inisialisasi
-        loadInitialMedia();
+        loadMedia();
         window.addEventListener("resize", () => updateSwiper(false));
 
         // Bintang animasi latar
