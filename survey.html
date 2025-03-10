@@ -41,6 +41,14 @@
             background: rgba(30, 27, 75, 0.8);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar {
+            display: none;
         }
         .card {
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
@@ -98,8 +106,8 @@
             <div class="survey-box" id="box5">5. ???</div>
         </div>
         <div class="input-grid">
-            <input id="input1" class="w-full p-2 bg-gray-800 text-white border rounded" disabled>
-            <input id="input2" class="w-full p-2 bg-gray-800 text-white border rounded" disabled>
+            <input id="input1" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="">
+            <input id="input2" class="w-full p-2 bg-gray-800 text-white border rounded" placeholder="">
         </div>
         <div id="result" class="mb-4 text-lg"></div>
         <button id="giveUpBtn" class="bg-red-400 text-white p-2 rounded hover:bg-red-500 mb-2 w-full">Menyerah</button>
@@ -107,34 +115,225 @@
         <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 w-full">Kembali</button>
     </div>
     <script>
-        const data = JSON.parse(localStorage.getItem("data"));
+        const data = JSON.parse(localStorage.getItem("data")) || { name1: "Pemain 1", name2: "Pemain 2" };
         const name1 = data.name1;
         const name2 = data.name2;
 
         const surveyQuestions = [
             {
-                question: "Makanan apa yang paling disukai pasangan?",
+                question: "Hal apa yang sering dilakukan pasangan saat bertengkar?",
                 answers: [
-                    { text: "Pizza", percentage: 45, revealed: false },
-                    { text: "Sushi", percentage: 25, revealed: false },
-                    { text: "Burger", percentage: 15, revealed: false },
-                    { text: "Nasi Goreng", percentage: 10, revealed: false },
-                    { text: "Mie Ayam", percentage: 5, revealed: false }
+                    { text: "Diam-diaman", percentage: 40, revealed: false },
+                    { text: "Balas-balasan", percentage: 30, revealed: false },
+                    { text: "Ngambek", percentage: 20, revealed: false },
+                    { text: "Ngajak baikan", percentage: 10, revealed: false },
+                    { text: "Cari pelarian baru", percentage: 1, revealed: false }
                 ],
-                reason: "Pizza jadi nomor satu karena praktis, enak, dan cocok untuk berbagai selera."
+                reason: "Diam-diaman jadi pilihan utama, mungkin karena semua sedang cari momen untuk menenangkan hati."
             },
             {
-                question: "Liburan romantis paling diimpikan?",
+                question: "Apa alasan utama seseorang telat bangun pagi?",
                 answers: [
-                    { text: "Pantai", percentage: 60, revealed: false },
-                    { text: "Gunung", percentage: 20, revealed: false },
-                    { text: "Kota", percentage: 10, revealed: false },
-                    { text: "Desa", percentage: 5, revealed: false },
-                    { text: "Pulau", percentage: 5, revealed: false }
+                    { text: "Alarmnya nggak bunyi", percentage: 55, revealed: false },
+                    { text: "Tidur larut nonton drama", percentage: 25, revealed: false },
+                    { text: "Salah hitung snooze", percentage: 15, revealed: false },
+                    { text: "Mimpi terlalu seru", percentage: 5, revealed: false },
+                    { text: "Kepikiran tugas besok pagi", percentage: 5, revealed: false }
                 ],
-                reason: "Pantai unggul karena suasana santai, pemandangan indah, dan romantis."
+                reason: "Alarm nggak bunyi sering jadi kambing hitam, padahal kadang memang lupa nyalain!"
+            },
+            {
+                question: "Apa yang sering dilakukan saat hujan tiba-tiba turun deras?",
+                answers: [
+                    { text: "Cari tempat berteduh", percentage: 85, revealed: false },
+                    { text: "Santai dan main hujan", percentage: 10, revealed: false },
+                    { text: "Ngomel ke langit", percentage: 4, revealed: false },
+                    { text: "Pura-pura nggak basah", percentage: 1, revealed: false },
+                    { text: "Tidur", percentage: 1, revealed: false }
+                ],
+                reason: "Mayoritas memilih tempat teduh biar nggak kebasahan, sisanya filosofis bercanda sama hujan."
+            },
+            {
+                question: "Apa yang paling sering dicari di kulkas waktu lapar tengah malam?",
+                answers: [
+                    { text: "Makanan sisa", percentage: 55, revealed: false },
+                    { text: "Cemilan dingin", percentage: 25, revealed: false },
+                    { text: "Air putih (terus jadi malas makan)", percentage: 10, revealed: false },
+                    { text: "Kulkas kosong, cuma ngecek", percentage: 8, revealed: false },
+                    { text: "Es krim biar happy", percentage: 2, revealed: false }
+                 ],
+                reason: "Makanan sisa selalu jadi pahlawan tengah malam!"
+            },
+            {
+                question: "Apa yang sering dilakukan orang saat kebosanan menyerang?",
+                answers: [
+                    { text: "Scrolling", percentage: 60, revealed: false },
+                    { text: "Ngemil tanpa henti", percentage: 20, revealed: false },
+                    { text: "Ngobrol sama diri sendiri", percentage: 10, revealed: false },
+                    { text: "Latihan ngakak di depan kaca", percentage: 5, revealed: false },
+                    { text: "Coba belajar sesuatu yang gagal", percentage: 5, revealed: false }
+                ],
+                reason: "Scrolling memang juaranya menghabiskan waktu!"
+            },
+            
+            {
+                question: "Apa yang paling sering bikin pasangan cemburu gara-gara media sosial?",
+                answers: [
+                    { text: "Like foto orang lain", percentage: 35, revealed: false },
+                    { text: "Chat sama temen lawan jenis", percentage: 30, revealed: false },
+                    { text: "Posting selfie kece tanpa ajak pasangan", percentage: 20, revealed: false },
+                    { text: "Nonton story mantan", percentage: 10, revealed: false },
+                    { text: "Uplod status galau tanpa konteks", percentage: 5, revealed: false }
+                ],
+                reason: "Like foto orang lain juaranya, soalnya itu kayak kode Morse-nya dunia digital: ‘Aku lihat kamu lebih oke dari pasanganku!’"
+            },
+            {
+                question: "Kalau pasanganmu kebanyakan main HP pas kalian bareng, kamu biasanya ngapain?",
+                answers: [
+                    { text: "Ikutan main HP juga", percentage: 40, revealed: false },
+                    { text: "Nyanyi-nyanyi biar diperhatiin", percentage: 25, revealed: false },
+                    { text: "Tarik HP-nya trus kabur", percentage: 15, revealed: false },
+                    { text: "Diem aja sambil nyanyi ‘Sia-sia mengharapmu’ di hati", percentage: 10, revealed: false },
+                    { text: "Bilang: ‘Sayuran lebih sehat dari HP, coba pegang brokoli!’", percentage: 10, revealed: false }
+                ],
+                reason: "Ikutan main HP menang, karena kalau kamu nggak bisa ngalahin musuh, gabung aja sama musuh—HP jadi temen baru!"
+            },
+            {
+                question: "Menurutmu, apa yang paling sering jadi penutup pertengkaran sama pasangan?",
+                answers: [
+                    { text: "Makan bareng", percentage: 45, revealed: false },
+                    { text: "Ciuman damai", percentage: 25, revealed: false },
+                    { text: "Salah satu ngalah bilang ‘ya udah terserah’", percentage: 15, revealed: false },
+                    { text: "Nonton Netflix bareng sambil pura-pura lupa", percentage: 10, revealed: false },
+                    { text: "Update status ‘Alhamdulillah baik lagi’", percentage: 5, revealed: false }
+                ],
+                reason: "Makan bareng jadi solusi universal, soalnya perut kenyang bikin hati susah marah"
+            },
+            {
+                question: "Kalau pasanganmu posting sesuatu di medsos yang bikin kamu kesel, apa reaksimu?",
+                answers: [
+                    { text: "Langsung komen: ‘Ini apa maksudnya?’", percentage: 30, revealed: false },
+                    { text: "Screenshot, kirim ke WA, trus debat", percentage: 25, revealed: false },
+                    { text: "Bales postingan dengan caption lebih pedes", percentage: 20, revealed: false },
+                    { text: "Diem aja, tapi unfollow bentar biar takut", percentage: 15, revealed: false },
+                    { text: "Buat meme tentang dia, upload di story", percentage: 10, revealed: false }
+                ],
+                reason: "Langsung komen jadi favorit, karena cepet, praktis, dan bisa bikin penutup drama lebih seru dari sinetron!"
+            },
+            
+            {
+                question: "Apa yang biasanya kamu lakukan kalau pasanganmu telat bales chat?",
+                answers: [
+                    { text: "Nunggu sabar sambil ngopi", percentage: 35, revealed: false },
+                    { text: "Spam chat ‘Halo? Masih hidup?’", percentage: 25, revealed: false },
+                    { text: "Cek last seen, trus overthinking", percentage: 20, revealed: false },
+                    { text: "Langsung telpon buat pastiin", percentage: 15, revealed: false },
+                    { text: "Udah biasa, malah lupa bales juga", percentage: 5, revealed: false }
+                ],
+                reason: "Nunggu sambil ngopi menang, soalnya kopi lebih setia dari notif WhatsApp!"
+            },
+            {
+                question: "Apa penyebab utama kamu cek HP pasangan diam-diam?",
+                answers: [
+                    { text: "Curiga ada chat mesra", percentage: 40, revealed: false },
+                    { text: "Penasaran sama meme yang dia ketawain", percentage: 25, revealed: false },
+                    { text: "Mau tahu dia pesen makan apa", percentage: 15, revealed: false },
+                    { text: "Cuma iseng, nggak sengaja kebuka", percentage: 10, revealed: false },
+                    { text: "Nyari bukti dia lupa ulang tahun", percentage: 10, revealed: false }
+                ],
+                reason: "Curiga chat mesra jadi alasan klasik, detektif amatir emang banyak di hubungan!"
+            },
+            {
+                question: "Kalau pasanganmu posting foto sama temen lawan jenis, reaksinya?",
+                answers: [
+                    { text: "Langsung komen ‘Aku kapan?’", percentage: 30, revealed: false },
+                    { text: "Like aja, tapi hati panas", percentage: 25, revealed: false },
+                    { text: "Cuek, toh aku juga gitu", percentage: 20, revealed: false },
+                    { text: "Tanya pelan: ‘Ini siapa sih?’", percentage: 15, revealed: false },
+                    { text: "Buat story balasan lebih kece", percentage: 10, revealed: false }
+                ],
+                reason: "Komen ‘Aku kapan?’ juara, soalnya cemburu itu seni yang harus keliatan!"
+            },
+            {
+                question: "Apa yang paling bikin kamu takut pasangan lihat di HP-mu?",
+                answers: [
+                    { text: "Chat ngomongin dia sama temen", percentage: 45, revealed: false },
+                    { text: "History nyari ‘cara minta maaf’", percentage: 20, revealed: false },
+                    { text: "Foto screenshot mantan", percentage: 15, revealed: false },
+                    { text: "Tabungan di dompet digital", percentage: 10, revealed: false },
+                    { text: "Playlist lagu galau", percentage: 10, revealed: false }
+                ],
+                reason: "Chat ngomongin dia terdeteksi, karena gosip itu lebih berbahaya dari bom waktu!"
+            },
+            {
+                question: "Seberapa sering kamu cek medsos pasangan buat ‘riset’?",
+                answers: [
+                    { text: "Tiap hari, wajib!", percentage: 30, revealed: false },
+                    { text: "Seminggu sekali, secukupnya", percentage: 25, revealed: false },
+                    { text: "Cuma pas curiga aja", percentage: 20, revealed: false },
+                    { text: "Jarang, males ribet", percentage: 15, revealed: false },
+                    { text: "Nggak pernah, percaya banget", percentage: 10, revealed: false }
+                ],
+                reason: "Tiap hari jadi kebiasaan, detektif cinta emang nggak pernah libur!"
+            },
+            {
+                question: "Apa yang kamu lakukan kalau pasangan lupa buka HP seharian?",
+                answers: [
+                    { text: "Panik, takut dia hilang", percentage: 35, revealed: false },
+                    { text: "Santai, mungkin lagi sibuk", percentage: 30, revealed: false },
+                    { text: "Nelfon temennya buat nanya", percentage: 15, revealed: false },
+                    { text: "Posting story sindiran", percentage: 10, revealed: false },
+                    { text: "Seneng, akhirnya bebas!", percentage: 10, revealed: false }
+                ],
+                reason: "Panik menang tipis, soalnya imajinasi buruk itu lebih cepet dari sinyal 5G!"
+            },
+            {
+                question: "Hal apa yang paling sering bikin ribut gara-gara medsos?",
+                answers: [
+                    { text: "Like postingan orang lain", percentage: 40, revealed: false },
+                    { text: "Lupa bales chat gara-gara scrolling", percentage: 25, revealed: false },
+                    { text: "Posting tanpa bilang dulu", percentage: 15, revealed: false },
+                    { text: "Tag temen lawan jenis", percentage: 10, revealed: false },
+                    { text: "Salah kirim emoji ke grup", percentage: 10, revealed: false }
+                ],
+                reason: "Like jadi biang kerok, karena satu jempol bisa nyanyi lebih kenceng dari kata ‘sayang’!"
+            },
+            {
+                question: "Kalau pasangan minta password medsosmu, kamu ngapain?",
+                answers: [
+                    { text: "Kasih, biar tenang", percentage: 35, revealed: false },
+                    { text: "Bilang: ‘Privasi dong!’", percentage: 25, revealed: false },
+                    { text: "Kasih password palsu", percentage: 15, revealed: false },
+                    { text: "Tanya balik: ‘Kamu dulu!’", percentage: 15, revealed: false },
+                    { text: "Hapus semua chat dulu", percentage: 10, revealed: false }
+                ],
+                reason: "Kasih password menang, soalnya damai itu lebih murah dari debat panjang!"
+            },
+            {
+                question: "Apa yang paling bikin kamu kesel pas pacaran di era digital?",
+                answers: [
+                    { text: "Doi lama bales chat", percentage: 45, revealed: false },
+                    { text: "Posting hal aneh di medsos", percentage: 20, revealed: false },
+                    { text: "Lelet buka link yang dikirim", percentage: 15, revealed: false },
+                    { text: "Video call burik sinyalnya", percentage: 10, revealed: false },
+                    { text: "Lupa matiin mic pas Zoom", percentage: 10, revealed: false }
+                ],
+                reason: "Lama bales chat juara, karena nunggu balesan itu lebih susah dari nunggu hujan di musim kemarau!"
+            },
+            {
+                question: "Kalau pasangan bilang ‘Aku off medsos bentar’, kamu yakin berapa lama?",
+                answers: [
+                    { text: "Cuma 1 jam, bohong banget", percentage: 40, revealed: false },
+                    { text: "Sehari, mungkin beneran", percentage: 25, revealed: false },
+                    { text: "Seminggu, wow salut!", percentage: 15, revealed: false },
+                    { text: "Sejam aja nggak kuat", percentage: 15, revealed: false },
+                    { text: "Selamanya, impian banget", percentage: 5, revealed: false }
+                ],
+                reason: "1 jam doang menang, soalnya medsos itu candu yang lebih kuat dari kopi susu!"
             }
-        ];
+    ];
+
+        
 
         let currentIndex = 0;
         let currentPlayer = 1;
@@ -144,6 +343,7 @@
         let p2Found = false;
         let p1WrongCount = 0;
         let p2WrongCount = 0;
+        let allQuestionsAnswered = false;
 
         const name1El = document.getElementById("name1");
         const name2El = document.getElementById("name2");
@@ -160,10 +360,23 @@
 
         name1El.textContent = name1;
         name2El.textContent = name2;
-        input1.placeholder = name1; // Placeholder jadi nama pasangan 1
-        input2.placeholder = name2; // Placeholder jadi nama pasangan 2
+        input1.placeholder = name1;
+        input2.placeholder = name2;
 
         function loadQuestion() {
+            if (allQuestionsAnswered) {
+                questionEl.textContent = "Pertanyaan sudah habis!";
+                surveyList.innerHTML = "";
+                turnEl.textContent = "Game Selesai";
+                input1.disabled = true;
+                input2.disabled = true;
+                giveUpBtn.classList.add("hidden");
+                nextBtn.classList.add("hidden");
+                const winner = score1 > score2 ? name1 : score2 > score1 ? name2 : "Seri";
+                resultEl.textContent = `Game selesai! Skor akhir: ${name1}: ${score1}, ${name2}: ${score2}. Pemenang: ${winner}!`;
+                return;
+            }
+
             const q = surveyQuestions[currentIndex];
             questionEl.textContent = q.question;
             turnEl.textContent = name1;
@@ -179,50 +392,63 @@
             input2.disabled = true;
             input1.value = "";
             input2.value = "";
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < q.answers.length; i++) {
                 const box = document.getElementById(`box${i + 1}`);
                 box.textContent = q.answers[i].revealed ? `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)` : `${i + 1}. ???`;
             }
         }
 
+        function isCloseEnough(userInput, surveyAnswer) {
+            const userWords = userInput.toLowerCase().split(" ");
+            const surveyWords = surveyAnswer.toLowerCase().split(" ");
+            let matchCount = 0;
+
+            userWords.forEach(userWord => {
+                if (surveyWords.some(surveyWord => surveyWord.includes(userWord) || userWord.includes(surveyWord))) {
+                    matchCount++;
+                }
+            });
+
+            return matchCount >= surveyWords.length / 2 || surveyAnswer.toLowerCase().includes(userInput.toLowerCase());
+        }
+
         function checkInput(player, input) {
             const q = surveyQuestions[currentIndex];
-            const guess = input.value.trim().toLowerCase();
+            const guess = input.value.trim();
             let found = false;
+            let matchedIndex = -1;
 
-            for (let i = 0; i < 5; i++) {
-                if (guess === q.answers[i].text.toLowerCase() && !q.answers[i].revealed) {
-                    q.answers[i].revealed = true;
-                    document.getElementById(`box${i + 1}`).textContent = `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)`;
-                    if (player === 1) {
-                        score1 += q.answers[i].percentage;
-                        score1El.textContent = score1;
-                        resultEl.textContent = `${name1} benar! +${q.answers[i].percentage} poin.`;
-                        p1Found = true;
-                        input1.disabled = true;
-                    } else {
-                        score2 += q.answers[i].percentage;
-                        score2El.textContent = score2;
-                        resultEl.textContent = `${name2} benar! +${q.answers[i].percentage} poin.`;
-                        p2Found = true;
-                        input2.disabled = true;
+            for (let i = 0; i < q.answers.length; i++) {
+                if (!q.answers[i].revealed) {
+                    if (guess.toLowerCase() === q.answers[i].text.toLowerCase() || isCloseEnough(guess, q.answers[i].text)) {
+                        q.answers[i].revealed = true;
+                        matchedIndex = i;
+                        document.getElementById(`box${i + 1}`).textContent = `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)`;
+                        if (player === 1) {
+                            score1 += q.answers[i].percentage;
+                            score1El.textContent = score1;
+                            resultEl.textContent = `${name1} benar! +${q.answers[i].percentage} poin.`;
+                            p1Found = true;
+                            input1.disabled = true;
+                        } else {
+                            score2 += q.answers[i].percentage;
+                            score2El.textContent = score2;
+                            resultEl.textContent = `${name2} benar! +${q.answers[i].percentage} poin.`;
+                            p2Found = true;
+                            input2.disabled = true;
+                        }
+                        found = true;
+                        break;
                     }
-                    found = true;
-                    break;
                 }
             }
 
             if (!found) {
                 if (player === 1) p1WrongCount++;
                 else p2WrongCount++;
-                const wrongCount = player === 1 ? p1WrongCount : p2WrongCount;
                 resultEl.textContent = "Anda salah! Survei tidak membuktikan.";
                 resultEl.classList.add("wrong");
-                resultEl.style.animation = `fadeShake ${0.5 - (wrongCount * 0.05)}s ease`;
-                setTimeout(() => {
-                    resultEl.classList.remove("wrong");
-                    resultEl.style.animation = "";
-                }, 500 - (wrongCount * 50));
+                setTimeout(() => resultEl.classList.remove("wrong"), 500);
             }
 
             input.value = "";
@@ -245,7 +471,7 @@
         }
 
         function revealAll(q) {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < q.answers.length; i++) {
                 q.answers[i].revealed = true;
                 document.getElementById(`box${i + 1}`).textContent = `${i + 1}. ${q.answers[i].text} (${q.answers[i].percentage}%)`;
             }
@@ -274,8 +500,11 @@
         };
 
         nextBtn.onclick = () => {
-            currentIndex = (currentIndex + 1) % surveyQuestions.length;
-            surveyQuestions[currentIndex].answers.forEach(a => a.revealed = false);
+            currentIndex++;
+            if (currentIndex >= surveyQuestions.length) {
+                allQuestionsAnswered = true;
+            }
+            surveyQuestions[currentIndex]?.answers.forEach(a => a.revealed = false);
             loadQuestion();
         };
 
