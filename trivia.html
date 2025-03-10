@@ -77,46 +77,83 @@
         const data = JSON.parse(localStorage.getItem("data"));
         const name1 = data.name1;
         const name2 = data.name2;
-
+    
         const triviaQuestions = [
-            {
-                question: "Kalau pacar jadi kendaraan, kamu pilih yang mana?",
-                options: ["Motor vespa", "Truk kontainer", "Sepeda ontel", "Pesawat kertas"],
-                answer: "Motor vespa",
-                explanation: "Vespa itu klasik, romantis, dan cukup cepet buat kabur bareng!"
+        {
+                question: "Burung terbang dengan?",
+                options: ["Sayap", "Semaunya", "Angin", "Mimpi"],
+                answer: "Semaunya",
+                explanation: "Burung terbang bebas, jadi 'semaunya' dia lahh"
             },
             {
-                question: "Hewan apa yang paling susah dilupain pas putus?",
-                options: ["Kamerael", "Kamera lelet", "Kamera leon", "Kamera njem duit"],
-                answer: "Kamera lelet",
-                explanation: "Kamera lelet (kamera + lelet = kura-kura) susah move on, jalannya pelan banget!"
+                question: "Kenapa orang makan dengan tangan kanan?",
+                options: ["Karena bersih", "Karena makanan", "Karena gampang", "karena kram"],
+                answer: "Karena makanan",
+                explanation: "Kalau pakai tangan kiri namanya 'makiri'"
             },
             {
-                question: "Kalau kencan pertama diadain di planet lain, pilih mana?",
-                options: ["Mars", "Jupiter", "Bumi (curang)", "Pluto yang bukan planet"],
-                answer: "Mars",
-                explanation: "Mars merah kayak hati, romantis abis, tapi jangan lupa bawa oksigen!"
+                question: "Selain mobil, bus, pesawat, orang pergi dari Jakarta ke Surabaya biasanya menggunakan?",
+                options: ["Tas", "Celana", "Koper", "Sepatu"],
+                answer: "Celana",
+                explanation: "Tanpa celana nggak bisa pergi, emang bisa pergi tanpa menggunakan celana?"
             },
             {
-                question: "Alasan paling masuk akal buat telat bales chat?",
-                options: ["Jadi penutup pintu", "Ngejar ayam tetangga", "Lupa cara ngetik", "Jadi superhero"],
-                answer: "Ngejar ayam tetangga",
-                explanation: "Ayam kabur itu bikin panik, wajar dong telat bales!"
+                question: "Seseorang yang memimpin sebuah desa, biasanya dipanggil pak?",
+                options: ["Kades", "Noleh", "sini", "Tua"],
+                answer: "Noleh",
+                explanation: "Dipanggil 'Pak' ya noleh,"
             },
             {
-                question: "Kalau hujan pas kencan, barang apa yang paling penting dibawa?",
-                options: ["Payung", "Kamera", "Baju renang", "Panci"],
-                answer: "Baju renang",
-                explanation: "Hujan? Jadi ajang pamer skill renang di genangan, kece abis!"
-            }
+                question: "Makan duit rakyat disebut?",
+                options: ["Korupsi", "Debus", "lapar", "Nangis"],
+                answer: "Debus",
+                explanation: "iya lah debuss, serem njir makan duit. makan beling aja udah serem"
+            },
+            {
+                question: "Permen apa yang bagian gulanya ada di luar, tapi bungkusnya justru di dalam?",
+                options: ["Permen produksi 90an", "Permen salah bikin", "Permen edisi bungkus", "Permen susu"],
+                answer: "Permen salah bikin",
+                explanation: "salah bikin ituuu, bisa dituntut aja masa kita makan plastik"
+            },
+            {
+                question: "Pintu apa yang didorong lima orang tetap tidak mau terbuka?",
+                options: ["Pintu rusak", "Pintu yang 'tarik'", "Pintu geser", "Pintu kaca"],
+                answer: "Pintu yang 'tarik'",
+                explanation: "Pintu ‘tarik’ didorong ya nggak bakal buka"
+            },
+            {
+                question: "Sayuran yang bisa nyanyi?",
+                options: ["brokoliplay", "Kolplay", "Bayamplay", "timunplay"],
+                answer: "Kolplay",
+                explanation: "itu lohh Coldplay yang nyanyi look at the stars..."
+            },
+            {
+                question: "Hewan yang paling pendiam?",
+                options: ["Semut", "Gajak", "Koala", "Kupu-kupu"],
+                answer: "Semut",
+                explanation: "iya semut karena semute, mute diam, jadi semut hewan paling diam"
+            },
+            {
+                question: "Orang takut gelap karena?",
+                options: ["Hantu", "Nggak lihat", "Sendirian", "Listrik"],
+                answer: "Listrik",
+                explanation: "Takut gelap yaa karena listriknya mati"
+            },
+            {
+                question: "Siapa artis yang kebanyakan mikir?",
+                options: ["Ayu Ting Ting", "dedi corbuzier", "Luna Maya", "Raffi Ahmad"],
+                answer: "Ayu Ting Ting",
+                explanation: "Ayu Thingking karena ayu thingking kebanyakan mikir"
+            },
         ];
-
+     
         let currentIndex = 0;
         let score1 = 0;
         let score2 = 0;
         let selectedAnswer1 = null;
         let selectedAnswer2 = null;
-
+        let allQuestionsAnswered = false; // Tambah variabel untuk melacak status pertanyaan
+    
         const questionEl = document.getElementById("question");
         const optionsEl = document.getElementById("options");
         const resultEl = document.getElementById("result");
@@ -126,11 +163,20 @@
         const score2El = document.getElementById("score2");
         const name1El = document.getElementById("name1");
         const name2El = document.getElementById("name2");
-
+    
         name1El.textContent = name1;
         name2El.textContent = name2;
-
+    
         function loadQuestion() {
+            if (allQuestionsAnswered) {
+                questionEl.textContent = "Pertanyaan sudah habis!";
+                optionsEl.innerHTML = "";
+                resultEl.textContent = "Game selesai! Terima kasih telah bermain.";
+                checkBtn.classList.add("hidden");
+                nextBtn.classList.add("hidden");
+                return;
+            }
+    
             const q = triviaQuestions[currentIndex];
             questionEl.textContent = q.question;
             optionsEl.innerHTML = "";
@@ -139,7 +185,7 @@
             checkBtn.classList.remove("hidden");
             selectedAnswer1 = null;
             selectedAnswer2 = null;
-
+    
             const options1Div = document.createElement("div");
             options1Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name1}, pilih jawabanmu:</p>`;
             q.options.forEach((option) => {
@@ -149,7 +195,7 @@
                 btn.onclick = () => selectAnswer(1, option);
                 options1Div.appendChild(btn);
             });
-
+    
             const options2Div = document.createElement("div");
             options2Div.innerHTML = `<p class="font-bold mb-2 text-pink-200">${name2}, pilih jawabanmu:</p>`;
             q.options.forEach((option) => {
@@ -159,11 +205,11 @@
                 btn.onclick = () => selectAnswer(2, option);
                 options2Div.appendChild(btn);
             });
-
+    
             optionsEl.appendChild(options1Div);
             optionsEl.appendChild(options2Div);
         }
-
+    
         function selectAnswer(player, option) {
             if (player === 1) {
                 selectedAnswer1 = option;
@@ -173,19 +219,19 @@
                 resultEl.textContent = selectedAnswer1 ? "Klik 'Cek Jawaban'" : `Tunggu ${name1} pilih jawaban.`;
             }
         }
-
+    
         checkBtn.onclick = () => {
             const q = triviaQuestions[currentIndex];
             let resultText = "";
-
+    
             if (!selectedAnswer1 || !selectedAnswer2) {
                 resultEl.textContent = "Kalian berdua harus pilih jawaban dulu!";
                 return;
             }
-
+    
             const isCorrect1 = selectedAnswer1 === q.answer;
             const isCorrect2 = selectedAnswer2 === q.answer;
-
+    
             if (isCorrect1 && isCorrect2) {
                 score1 += 1;
                 score2 += 1;
@@ -199,19 +245,22 @@
             } else {
                 resultText = `<span class="text-red-400">Kalian berdua salah!</span> Jawaban: ${q.answer}. ${q.explanation}`;
             }
-
+    
             score1El.textContent = score1;
             score2El.textContent = score2;
             resultEl.innerHTML = resultText;
             checkBtn.classList.add("hidden");
             nextBtn.classList.remove("hidden");
         };
-
+    
         nextBtn.onclick = () => {
-            currentIndex = (currentIndex + 1) % triviaQuestions.length;
+            currentIndex++;
+            if (currentIndex >= triviaQuestions.length) {
+                allQuestionsAnswered = true; // Set status ketika semua pertanyaan habis
+            }
             loadQuestion();
         };
-
+    
         loadQuestion();
         const starsContainer = document.getElementById("stars");
         for (let i = 0; i < 100; i++) {
