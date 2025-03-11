@@ -1,628 +1,684 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foto Studio</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #1e1b4b, #2d2673, #3b528b, #2a7049);
-            background-size: 200% 200%;
-            animation: auroraBG 15s ease infinite;
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
-        }
-        @keyframes auroraBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-        .container {
-            background: rgba(30, 27, 75, 0.8);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            padding: 1rem;
-            max-height: 100vh;
-            min-height: 101vh;
-            overflow-y: scroll;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foto Studio</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1e1b4b, #2d2673, #3b528b, #2a7049);
+      background-size: 200% 200%;
+      animation: auroraBG 15s ease infinite;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .container::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
+    @keyframes auroraBG {
+      0% {
+        background-position: 0% 50%;
+      }
 
-        .container::-webkit-scrollbar-thumb {
-            background: transparent;
-        }
+      50% {
+        background-position: 100% 50%;
+      }
 
-        .container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-        .strip-container {
-            width: 200px;
-            max-height: 100vh;
-            overflow-y: auto;
-            margin: 0 auto;
-        }
-        #stripCanvas {
-            width: 100%;
-        }
-        #cameraContainer {
-            position: relative;
-        }
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
 
-        /* Memusatkan tampilan pratinjau kamera */
-        #video {
-            transform: scaleX(-1);
-            margin: 0 auto;
-            display: block;
-        }
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
 
-        /*Penghitung Waktu Mundur di Dalam Kotak Pratinjau*/
-        #countdown {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff6b6b;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-            z-index: 10; /*Pastikan terlihat di atas video*/
-        }
+    @keyframes twinkle {
+      0%,
+      100% {
+        opacity: 0.2;
+      }
 
-        /*Memindahkan Tombol ke Bawah Kotak Pratinjau*/
-        #start {
-            margin-top: 1rem; /*Tambahkan jarak di atas tombol*/
-        }
+      50% {
+        opacity: 1;
+      }
+    }
 
-        #flash {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            opacity: 0;
-            pointer-events: none;
-        }
-        @keyframes flashEffect {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        .custom-options {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem;
-            border-radius: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-        }
-        .custom-option {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-    </style>
+    .container {
+      background: rgba(30, 27, 75, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      max-height: 100vh;
+      min-height: 101vh;
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+
+    .container::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+
+    .container {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .strip-container {
+      width: 200px;
+      max-height: 100vh;
+      overflow-y: auto;
+      margin: 0 auto;
+    }
+
+    #stripCanvas {
+      width: 100%;
+    }
+
+    #cameraContainer {
+      position: relative;
+    }
+
+    /* Memusatkan tampilan pratinjau kamera */
+    #video {
+      transform: scaleX(-1);
+      margin: 0 auto;
+      display: block;
+    }
+
+    /*Penghitung Waktu Mundur di Dalam Kotak Pratinjau*/
+    #countdown {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ff6b6b;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.2rem 0.5rem;
+      border-radius: 5px;
+      z-index: 10;
+      /*Pastikan terlihat di atas video*/
+    }
+
+    /*Memindahkan Tombol ke Bawah Kotak Pratinjau*/
+    #start {
+      margin-top: 1rem;
+      /*Tambahkan jarak di atas tombol*/
+    }
+
+    #flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes flashEffect {
+      0% {
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .custom-options {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem;
+      border-radius: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .custom-option {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+  </style>
 </head>
+
 <body class="flex items-center justify-center h-screen">
-    <div class="stars" id="stars"></div>
-    <div id="flash"></div>
-    <div class="container w-full max-w-md text-center">
-        <h1 class="text-xl font-bold mb-1 text-pink-300">Foto Studio</h1>
-        <div id="cameraContainer" class="mb-1 relative">
-            <video id="video" width="320" height="240" autoplay class="rounded-lg mb-1"></video>
-             <!-- PENTING: countdown sekarang di dalam cameraContainer -->
-            <div id="countdown"></div>
-            <button id="start" class="bg-blue-400 text-white p-1 rounded hover:bg-blue-500 w-full text-sm">Mulai Foto</button>
-        </div>
-       
-        <div id="resultContainer" class="hidden mb-1">
-            <div class="strip-container">
-                <canvas id="stripCanvas"></canvas>
-            </div>
-            <p class="mt-1 text-sm"><span id="name1"></span> & <span id="name2"></span></p>
-
-            <div id="editOptions" class="mb-2">
-                <h2 class="text-lg font-semibold mb-1 text-pink-300">Edit Strip</h2>
-
-                <div class="mb-2">
-                    <label for="stripColor" class="block text-sm font-medium text-white">Warna Strip:</label>
-                    <input type="color" id="stripColor" value="#ff6b6b" class="w-full">
-                </div>
-
-                <div class="mb-2">
-                    <label for="stripWidth" class="block text-sm font-medium text-white">Lebar Strip:</label>
-                    <input type="range" id="stripWidth" min="150" max="250" value="200" class="w-full">
-                </div>
-
-                <div class="mb-2">
-                    <label for="backgroundOpacity" class="block text-sm font-medium text-white">Opasitas Background:</label>
-                    <input type="range" id="backgroundOpacity" min="0" max="1" step="0.01" value="1" class="w-full">
-                </div>
-
-                <div class="mb-2">
-                  <label for="photoSpacing" class="block text-sm font-medium text-white">Spasi Foto:</label>
-                  <input type="range" id="photoSpacing" min="0" max="30" value="10" class="w-full">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                      <label for="patternType" class="block text-sm font-medium text-white">Pola:</label>
-                      <select id="patternType" class="bg-gray-800 text-white text-xs p-1 rounded w-full">
-                          <option value="star">Bintang</option>
-                          <option value="heart">Hati</option>
-                          <option value="circle">Lingkaran</option>
-                          <option value="triangle">Segitiga</option>
-                          <option value="diamond">Berlian</option>
-                          <option value="flower">Bunga</option>
-                          <option value="cross">Silang</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label for="patternColor" class="block text-sm font-medium text-white">Warna Pola:</label>
-                      <input type="color" id="patternColor" value="#ffcccb" class="w-full">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                      <label for="confettiType" class="block text-sm font-medium text-white">Pernak:</label>
-                      <select id="confettiType" class="bg-gray-800 text-white text-xs p-1 rounded w-full">
-                          <option value="circle">Lingkaran</option>
-                          <option value="square">Kotak</option>
-                          <option value="star">Bintang</option>
-                          <option value="heart">Hati</option>
-                          <option value="flower">Bunga</option>
-                          <option value="sparkle">Kilau</option>
-                          <option value="drop">Tetes</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label for="confettiColor" class="block text-sm font-medium text-white">Warna Pernak:</label>
-                      <input type="color" id="confettiColor" value="#ffd700" class="w-full">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label for="patternSize" class="block text-sm font-medium text-white">Ukuran Pola:</label>
-                    <input type="range" id="patternSize" min="1" max="20" value="8" class="w-full">
-                  </div>
-                  <div>
-                      <label for="confettiSize" class="block text-sm font-medium text-white">Ukuran Konfeti:</label>
-                      <input type="range" id="confettiSize" min="1" max="10" value="5" class="w-full">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label for="photoRotation0" class="block text-sm font-medium text-white">Rotasi Foto 1:</label>
-                    <input type="range" id="photoRotation0" min="-10" max="10" value="0" step="0.1" class="w-full">
-                  </div>
-                  <div>
-                    <label for="photoRotation1" class="block text-sm font-medium text-white">Rotasi Foto 2:</label>
-                    <input type="range" id="photoRotation1" min="-10" max="10" value="0" step="0.1" class="w-full">
-                  </div>
-                  <div>
-                    <label for="photoRotation2" class="block text-sm font-medium text-white">Rotasi Foto 3:</label>
-                    <input type="range" id="photoRotation2" min="-10" max="10" value="0" step="0.1" class="w-full">
-                  </div>
-                  <div>
-                    <label for="photoRotation3" class="block text-sm font-medium text-white">Rotasi Foto 4:</label>
-                    <input type="range" id="photoRotation3" min="-10" max="10" value="0" step="0.1" class="w-full">
-                  </div>
-                </div>
-
-            </div>
-
-            <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
-            <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
-            <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1">Kembali</button> <!-- TOMBOL KEMBALI DIPINDAHKAN KE PALING BAWAH-->
-        </div>
-         <button onclick="window.location.href='welcome.html'" class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1 hidden">Kembali</button>
+  <div class="stars" id="stars"></div>
+  <div id="flash"></div>
+  <div class="container w-full max-w-md text-center">
+    <h1 class="text-xl font-bold mb-1 text-pink-300">Foto Studio</h1>
+    <div id="cameraContainer" class="mb-1 relative">
+      <video id="video" width="320" height="240" autoplay class="rounded-lg mb-1"></video>
+      <!-- PENTING: countdown sekarang di dalam cameraContainer -->
+      <div id="countdown"></div>
+      <button id="start" class="bg-blue-400 text-white p-1 rounded hover:bg-blue-500 w-full text-sm">Mulai Foto</button>
     </div>
 
-    <script>
-        const data = JSON.parse(localStorage.getItem("data"));
-        const name1 = data ? data.name1 : "Pasangan 1";
-        const name2 = data ? data.name2 : "Pasangan 2";
+    <div id="resultContainer" class="hidden mb-1">
+      <div class="strip-container">
+        <canvas id="stripCanvas"></canvas>
+      </div>
+      <p class="mt-1 text-sm"><span id="name1"></span> & <span id="name2"></span></p>
 
-        const video = document.getElementById("video");
-        const startBtn = document.getElementById("start");
-        const countdownEl = document.getElementById("countdown");
-        const flashEl = document.getElementById("flash");
-        const cameraContainer = document.getElementById("cameraContainer");
-        const resultContainer = document.getElementById("resultContainer");
-        const stripCanvas = document.getElementById("stripCanvas");
-        const retry = document.getElementById("retry");
-        const save = document.getElementById("save");
-        const name1El = document.getElementById("name1");
-        const name2El = document.getElementById("name2");
+      <div id="editOptions" class="mb-2">
+        <h2 class="text-lg font-semibold mb-1 text-pink-300">Edit Strip</h2>
 
-        let stream;
-        let photos = [];
+        <div class="mb-2">
+          <label for="stripColor" class="block text-sm font-medium text-white">Warna Strip:</label>
+          <input type="text" id="stripColor" value="#ff6b6b" class="coloris w-full">
+        </div>
 
-        // Variabel kontrol edit (inisialisasi di sini, tapi event listener nanti)
-        const stripWidthSlider = document.getElementById("stripWidth");
-        const backgroundOpacitySlider = document.getElementById("backgroundOpacity");
-        const photoSpacingSlider = document.getElementById("photoSpacing");
-        const patternTypeSelect = document.getElementById("patternType");
-        const patternColorInput = document.getElementById("patternColor");
-        const confettiTypeSelect = document.getElementById("confettiType");
-        const confettiColorInput = document.getElementById("confettiColor");
-        const patternSizeSlider = document.getElementById("patternSize");
-        const confettiSizeSlider = document.getElementById("confettiSize");
-        const photoRotationSliders = [
-            document.getElementById("photoRotation0"),
-            document.getElementById("photoRotation1"),
-            document.getElementById("photoRotation2"),
-            document.getElementById("photoRotation3")
-        ];
-        const stripColorInput = document.getElementById("stripColor");
+        <div class="mb-2">
+          <label for="stripWidth" class="block text-sm font-medium text-white">Lebar Strip:</label>
+          <input type="range" id="stripWidth" min="150" max="250" value="200" class="w-full">
+        </div>
 
-        let stripWidth = 200;
-        let backgroundOpacity = 1;
-        let photoSpacing = 10;
-        let patternSize = 8;
-        let confettiSize = 5;
-        let photoRotations = [0, 0, 0, 0];
+        <div class="mb-2">
+          <label for="backgroundOpacity" class="block text-sm font-medium text-white">Opasitas Background:</label>
+          <input type="range" id="backgroundOpacity" min="0" max="1" step="0.01" value="1" class="w-full">
+        </div>
 
-        name1El.textContent = name1;
-        name2El.textContent = name2;
+        <div class="mb-2">
+          <label for="photoSpacing" class="block text-sm font-medium text-white">Spasi Foto:</label>
+          <input type="range" id="photoSpacing" min="0" max="30" value="10" class="w-full">
+        </div>
 
-        // Akses kamera tanpa mirror
-        async function initCamera() {
-            try {
-                console.log("Mencoba akses kamera...");
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
-                        facingMode: "user"
-                    }
-                });
-                video.srcObject = stream;
-                console.log("Kamera berhasil diakses! Resolusi:", video.videoWidth, "x", video.videoHeight);
-            } catch (err) {
-                console.error("Gagal akses kamera:", err);
-                alert("Gagal akses kamera: " + err.message);
-            }
-        }
-        initCamera();
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="patternType" class="block text-sm font-medium text-white">Pola:</label>
+            <select id="patternType" class="bg-gray-800 text-white text-xs p-1 rounded w-full">
+              <option value="none">Tidak Ada</option>
+              <option value="star">Bintang</option>
+              <option value="heart">Hati</option>
+              <option value="circle">Lingkaran</option>
+              <option value="triangle">Segitiga</option>
+              <option value="diamond">Berlian</option>
+              <option value="flower">Bunga</option>
+              <option value="cross">Silang</option>
+            </select>
+          </div>
+          <div>
+            <label for="patternColor" class="block text-sm font-medium text-white">Warna Pola:</label>
+            <input type="text" id="patternColor" value="#ffcccb" class="coloris w-full">
+          </div>
+        </div>
 
-        // Ambil foto dengan resolusi tinggi
-        function takePhoto() {
-            console.log("Mengambil foto...");
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth || 1920;
-            canvas.height = video.videoHeight || 1080;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            return canvas;
-        }
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="confettiType" class="block text-sm font-medium text-white">Pernak:</label>
+            <select id="confettiType" class="bg-gray-800 text-white text-xs p-1 rounded w-full">
+              <option value="none">Tidak Ada</option>
+              <option value="circle">Lingkaran</option>
+              <option value="square">Kotak</option>
+              <option value="star">Bintang</option>
+              <option value="heart">Hati</option>
+              <option value="flower">Bunga</option>
+              <option value="sparkle">Kilau</option>
+              <option value="drop">Tetes</option>
+            </select>
+          </div>
+          <div>
+            <label for="confettiColor" class="block text-sm font-medium text-white">Warna Pernak:</label>
+            <input type="text" id="confettiColor" value="#ffd700" class="coloris w-full">
+          </div>
+        </div>
 
-        // Animasi flash
-        function flash() {
-            console.log("Flash!");
-            flashEl.style.animation = "flashEffect 0.2s ease";
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="patternSize" class="block text-sm font-medium text-white">Ukuran Pola:</label>
+            <input type="range" id="patternSize" min="1" max="20" value="8" class="w-full">
+          </div>
+          <div>
+            <label for="confettiSize" class="block text-sm font-medium text-white">Ukuran Konfeti:</label>
+            <input type="range" id="confettiSize" min="1" max="10" value="5" class="w-full">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="photoRotation0" class="block text-sm font-medium text-white">Rotasi Foto 1:</label>
+            <input type="range" id="photoRotation0" min="-10" max="10" value="0" step="0.1" class="w-full">
+          </div>
+          <div>
+            <label for="photoRotation1" class="block text-sm font-medium text-white">Rotasi Foto 2:</label>
+            <input type="range" id="photoRotation1" min="-10" max="10" value="0" step="0.1" class="w-full">
+          </div>
+          <div>
+            <label for="photoRotation2" class="block text-sm font-medium text-white">Rotasi Foto 3:</label>
+            <input type="range" id="photoRotation2" min="-10" max="10" value="0" step="0.1" class="w-full">
+          </div>
+          <div>
+            <label for="photoRotation3" class="block text-sm font-medium text-white">Rotasi Foto 4:</label>
+            <input type="range" id="photoRotation3" min="-10" max="10" value="0" step="0.1" class="w-full">
+          </div>
+        </div>
+
+      </div>
+
+      <button id="retry" class="bg-yellow-400 text-white p-1 rounded hover:bg-yellow-500 mt-1 w-full text-sm">Ulang</button>
+      <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
+      <button onclick="window.location.href='welcome.html'"
+        class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1">Kembali</button>
+      <!-- TOMBOL KEMBALI DIPINDAHKAN KE PALING BAWAH-->
+    </div>
+    <button onclick="window.location.href='welcome.html'"
+      class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1 hidden">Kembali</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Coloris({
+        el: '.coloris',
+        themeMode: 'dark', // opsional
+      });
+    });
+
+    const data = JSON.parse(localStorage.getItem("data"));
+    const name1 = data ? data.name1 : "Pasangan 1";
+    const name2 = data ? data.name2 : "Pasangan 2";
+
+    const video = document.getElementById("video");
+    const startBtn = document.getElementById("start");
+    const countdownEl = document.getElementById("countdown");
+    const flashEl = document.getElementById("flash");
+    const cameraContainer = document.getElementById("cameraContainer");
+    const resultContainer = document.getElementById("resultContainer");
+    const stripCanvas = document.getElementById("stripCanvas");
+    const retry = document.getElementById("retry");
+    const save = document.getElementById("save");
+    const name1El = document.getElementById("name1");
+    const name2El = document.getElementById("name2");
+
+    let stream;
+    let photos = [];
+
+    // Variabel kontrol edit (inisialisasi di sini, tapi event listener nanti)
+    const stripWidthSlider = document.getElementById("stripWidth");
+    const backgroundOpacitySlider = document.getElementById("backgroundOpacity");
+    const photoSpacingSlider = document.getElementById("photoSpacing");
+    const patternTypeSelect = document.getElementById("patternType");
+    const patternColorInput = document.getElementById("patternColor");
+    const confettiTypeSelect = document.getElementById("confettiType");
+    const confettiColorInput = document.getElementById("confettiColor");
+    const patternSizeSlider = document.getElementById("patternSize");
+    const confettiSizeSlider = document.getElementById("confettiSize");
+    const photoRotationSliders = [
+      document.getElementById("photoRotation0"),
+      document.getElementById("photoRotation1"),
+      document.getElementById("photoRotation2"),
+      document.getElementById("photoRotation3")
+    ];
+    const stripColorInput = document.getElementById("stripColor");
+
+    let stripWidth = 200;
+    let backgroundOpacity = 1;
+    let photoSpacing = 10;
+    let patternSize = 8;
+    let confettiSize = 5;
+    let photoRotations = [0, 0, 0, 0];
+
+    name1El.textContent = name1;
+    name2El.textContent = name2;
+
+    // Akses kamera tanpa mirror
+    async function initCamera() {
+      try {
+        console.log("Mencoba akses kamera...");
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            facingMode: "user"
+          }
+        });
+        video.srcObject = stream;
+        console.log("Kamera berhasil diakses! Resolusi:", video.videoWidth, "x", video.videoHeight);
+      } catch (err) {
+        console.error("Gagal akses kamera:", err);
+        alert("Gagal akses kamera: " + err.message);
+      }
+    }
+    initCamera();
+
+    // Ambil foto dengan resolusi tinggi
+    function takePhoto() {
+      console.log("Mengambil foto...");
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1920;
+      canvas.height = video.videoHeight || 1080;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return canvas;
+    }
+
+    // Animasi flash
+    function flash() {
+      console.log("Flash!");
+      flashEl.style.animation = "flashEffect 0.2s ease";
+      setTimeout(() => {
+        flashEl.style.animation = "";
+      }, 200);
+    }
+
+    // Hitung mundur dan potret
+    function countdownAndSnap(count) {
+      return new Promise(resolve => {
+        console.log(`Mulai hitung mundur untuk foto ${count}...`);
+        let timeLeft = 5;
+        countdownEl.textContent = timeLeft;
+        const timer = setInterval(() => {
+          timeLeft--;
+          countdownEl.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            flash();
             setTimeout(() => {
-                flashEl.style.animation = "";
+              const photo = takePhoto();
+              photos.push(photo);
+              countdownEl.textContent = "";
+              console.log(`Foto ${count} diambil`);
+              resolve();
             }, 200);
+          }
+        }, 1000);
+      });
+    }
+
+    startBtn.onclick = async () => {
+      if (!stream) {
+        alert("Kamera belum siap! Tunggu sebentar atau refresh halaman.");
+        return;
+      }
+      photos = [];
+      startBtn.disabled = true;
+      console.log("Mulai sesi foto...");
+
+      for (let i = 1; i <= 4; i++) {
+        await countdownAndSnap(i);
+      }
+
+      console.log("Semua foto diambil, render strip...");
+      renderStrip();
+      console.log("Strip dirender, pindah ke hasil...");
+      cameraContainer.classList.add("hidden");
+      resultContainer.classList.remove("hidden");
+      if (stream) stream.getTracks().forEach(track => track.stop());
+      startBtn.disabled = false;
+      console.log("Sesi foto selesai.");
+
+      stripWidthSlider.addEventListener("input", () => {
+        stripWidth = parseInt(stripWidthSlider.value);
+        renderStrip();
+      });
+
+      backgroundOpacitySlider.addEventListener("input", () => {
+        backgroundOpacity = parseFloat(backgroundOpacitySlider.value);
+        renderStrip();
+      });
+
+      photoSpacingSlider.addEventListener("input", () => {
+        photoSpacing = parseInt(photoSpacingSlider.value);
+        renderStrip();
+      });
+
+      patternTypeSelect.addEventListener("change", () => {
+        renderStrip();
+        console.log("patternTypeSelect dijalankan");
+      });
+
+      patternColorInput.addEventListener("input", () => {
+        renderStrip();
+      });
+
+      confettiTypeSelect.addEventListener("change", () => {
+        renderStrip();
+      });
+
+      confettiColorInput.addEventListener("input", () => {
+        renderStrip();
+      });
+
+      patternSizeSlider.addEventListener("input", () => {
+        patternSize = parseInt(patternSizeSlider.value);
+        renderStrip();
+      });
+
+      confettiSizeSlider.addEventListener("input", () => {
+        confettiSize = parseInt(confettiSizeSlider.value);
+        renderStrip();
+      });
+
+      photoRotationSliders.forEach((slider, index) => {
+        slider.addEventListener("input", () => {
+          photoRotations[index] = parseFloat(slider.value);
+          renderStrip();
+        });
+      });
+
+      stripColorInput.addEventListener("input", () => {
+        renderStrip();
+      });
+    };
+
+    // Render strip dengan custom design
+    function renderStrip() {
+      const ctx = stripCanvas.getContext("2d");
+
+      // Hitung tinggi strip berdasarkan 4 foto
+      const photoWidth = 150;
+      const photoHeight = photoWidth * (video.videoHeight / video.videoWidth);
+      const totalHeight = (4 * photoHeight) + (3 * photoSpacing) + 40;
+      stripCanvas.width = stripWidth;
+      stripCanvas.height = totalHeight;
+
+      // Background strip (custom warna + opasitas)
+      ctx.fillStyle = stripColorInput.value;
+      ctx.globalAlpha = backgroundOpacity;
+      ctx.fillRect(0, 0, stripWidth, totalHeight);
+      ctx.globalAlpha = 1;
+
+      // Pola samping (custom tipe dan warna)
+      const pattern = patternTypeSelect.value;
+      if (pattern !== "none") {
+        ctx.fillStyle = patternColorInput.value;
+        for (let y = 20; y < totalHeight; y += 60) {
+          if (pattern === "star") drawStar(ctx, 10, y, patternSize, 5);
+          else if (pattern === "heart") drawHeart(ctx, 10, y, patternSize);
+          else if (pattern === "circle") drawCircle(ctx, 10, y, patternSize);
+          else if (pattern === "triangle") drawTriangle(ctx, 10, y, patternSize);
+          else if (pattern === "diamond") drawDiamond(ctx, 10, y, patternSize);
+          else if (pattern === "flower") drawFlower(ctx, 10, y, patternSize);
+          else if (pattern === "cross") drawCross(ctx, 10, y, patternSize);
+
+          if (pattern === "star") drawStar(ctx, stripWidth - 10, y, patternSize, 5);
+          else if (pattern === "heart") drawHeart(ctx, stripWidth - 10, y, patternSize);
+          else if (pattern === "circle") drawCircle(ctx, stripWidth - 10, y, patternSize);
+          else if (pattern === "triangle") drawTriangle(ctx, stripWidth - 10, y, patternSize);
+          else if (pattern === "diamond") drawDiamond(ctx, stripWidth - 10, y, patternSize);
+          else if (pattern === "flower") drawFlower(ctx, stripWidth - 10, y, patternSize);
+          else if (pattern === "cross") drawCross(ctx, stripWidth - 10, y, patternSize);
         }
+      }
 
-        // Hitung mundur dan potret
-        function countdownAndSnap(count) {
-            return new Promise(resolve => {
-                console.log(`Mulai hitung mundur untuk foto ${count}...`);
-                let timeLeft = 5;
-                countdownEl.textContent = timeLeft;
-                const timer = setInterval(() => {
-                    timeLeft--;
-                    countdownEl.textContent = timeLeft;
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        flash();
-                        setTimeout(() => {
-                            const photo = takePhoto();
-                            photos.push(photo);
-                            countdownEl.textContent = "";
-                            console.log(`Foto ${count} diambil`);
-                            resolve();
-                        }, 200);
-                    }
-                }, 1000);
-            });
+      // Pernak-pernik (custom tipe dan warna)
+      const confetti = confettiTypeSelect.value;
+      if (confetti !== "none") {
+        ctx.fillStyle = confettiColorInput.value;
+        for (let i = 0; i < 30; i++) {
+          const x = Math.random() * 30 + (Math.random() < 0.5 ? 0 : (stripWidth - 30));
+          const y = Math.random() * totalHeight;
+          if (confetti === "circle") drawCircle(ctx, x, y, confettiSize);
+          else if (confetti === "square") drawSquare(ctx, x, y, confettiSize * 1.5);
+          else if (confetti === "star") drawStar(ctx, x, y, confettiSize * 2, 5);
+          else if (confetti === "heart") drawHeart(ctx, x, y, confettiSize);
+          else if (confetti === "flower") drawFlower(ctx, x, y, confettiSize);
+          else if (confetti === "sparkle") drawSparkle(ctx, x, y, confettiSize);
+          else if (confetti === "drop") drawDrop(ctx, x, y, confettiSize);
         }
+      }
 
-        startBtn.onclick = async () => {
-            if (!stream) {
-                alert("Kamera belum siap! Tunggu sebentar atau refresh halaman.");
-                return;
-            }
-            photos = [];
-            startBtn.disabled = true;
-            console.log("Mulai sesi foto...");
+      // Tempel foto (proporsional dengan spasi + rotasi)
+      console.log("Menggambar foto...");
+      const startY = 20;
+      const photoX = (stripWidth - photoWidth) / 2;
+      for (let i = 0; i < 4; i++) {
+        ctx.save();
 
-            for (let i = 1; i <= 4; i++) {
-                await countdownAndSnap(i);
-            }
+        const y = startY + (photoHeight + photoSpacing) * i + photoHeight / 2;
+        ctx.translate(photoX + (photoWidth / 2), y);
 
-            console.log("Semua foto diambil, render strip...");
-            renderStrip();
-            console.log("Strip dirender, pindah ke hasil...");
-            cameraContainer.classList.add("hidden");
-            resultContainer.classList.remove("hidden");
-            if (stream) stream.getTracks().forEach(track => track.stop());
-            startBtn.disabled = false;
-            console.log("Sesi foto selesai.");
+        ctx.rotate(photoRotations[i] * Math.PI / 180);
 
-            stripWidthSlider.addEventListener("input", () => {
-                stripWidth = parseInt(stripWidthSlider.value);
-                renderStrip();
-            });
+        ctx.drawImage(photos[i], -photoWidth / 2, -photoHeight / 2, photoWidth, photoHeight);
 
-            backgroundOpacitySlider.addEventListener("input", () => {
-                backgroundOpacity = parseFloat(backgroundOpacitySlider.value);
-                renderStrip();
-            });
+        ctx.restore();
+      }
+    }
 
-            photoSpacingSlider.addEventListener("input", () => {
-                photoSpacing = parseInt(photoSpacingSlider.value);
-                renderStrip();
-            });
+    // Fungsi gambar pola
+    function drawStar(ctx, x, y, r, points) {
+      ctx.beginPath();
+      for (let i = 0; i < points * 2; i++) {
+        const angle = (Math.PI / points) * i;
+        const radius = i % 2 === 0 ? r : r / 2;
+        ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
 
-            patternTypeSelect.addEventListener("change", () => {
-                renderStrip();
-            });
+    function drawHeart(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x + size / 4, y - size / 2, x + size, y - size / 8, x, y + size / 2);
+      ctx.bezierCurveTo(x - size, y - size / 8, x - size / 4, y - size / 2, x, y);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-            patternColorInput.addEventListener("input", () => {
-                renderStrip();
-            });
+    function drawCircle(ctx, x, y, r) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-            confettiTypeSelect.addEventListener("change", () => {
-                renderStrip();
-            });
+    function drawTriangle(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.lineTo(x - size / 2, y + size / 2);
+      ctx.lineTo(x + size / 2, y + size / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-            confettiColorInput.addEventListener("input", () => {
-                renderStrip();
-            });
+    function drawDiamond(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.lineTo(x - size / 2, y);
+      ctx.lineTo(x, y + size / 2);
+      ctx.lineTo(x + size / 2, y);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-            patternSizeSlider.addEventListener("input", () => {
-                patternSize = parseInt(patternSizeSlider.value);
-                renderStrip();
-            });
+    function drawFlower(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.arc(x - size / 2, y - size / 2, size / 4, 0, 2 * Math.PI);
+      ctx.arc(x + size / 2, y - size / 2, size / 4, 0, 2 * Math.PI);
+      ctx.arc(x - size / 2, y + size / 2, size / 4, 0, 2 * Math.PI);
+      ctx.arc(x + size / 2, y + size / 2, size / 4, 0, 2 * Math.PI);
+      ctx.arc(x, y, size / 3, 0, 2 * Math.PI);
+      ctx.fill();
+    }
 
-            confettiSizeSlider.addEventListener("input", () => {
-                confettiSize = parseInt(confettiSizeSlider.value);
-                renderStrip();
-            });
+    function drawCross(ctx, x, y, size) {
+      ctx.fillRect(x - size / 6, y - size / 2, size / 3, size);
+      ctx.fillRect(x - size / 2, y - size / 6, size, size / 3);
+    }
 
-            photoRotationSliders.forEach((slider, index) => {
-                slider.addEventListener("input", () => {
-                    photoRotations[index] = parseFloat(slider.value);
-                    renderStrip();
-                });
-            });
+    function drawSparkle(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.lineTo(x + size / 4, y - size / 4);
+      ctx.lineTo(x + size / 2, y);
+      ctx.lineTo(x + size / 4, y + size / 4);
+      ctx.lineTo(x, y + size / 2);
+      ctx.lineTo(x - size / 4, y + size / 4);
+      ctx.lineTo(x - size / 2, y);
+      ctx.lineTo(x - size / 4, y - size / 4);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-            stripColorInput.addEventListener("input", () => {
-                renderStrip();
-            });
-        };
+    function drawDrop(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.bezierCurveTo(x + size / 4, y - size / 4, x + size / 2, y + size / 4, x, y + size / 2);
+      ctx.bezierCurveTo(x - size / 2, y + size / 4, x - size / 4, y - size / 4, x, y - size / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-        // Render strip dengan custom design
-        function renderStrip() {
-            const ctx = stripCanvas.getContext("2d");
+    // Ulang foto
+    retry.onclick = () => {
+      console.log("Mengulang sesi foto...");
+      cameraContainer.classList.remove("hidden");
+      resultContainer.classList.add("hidden");
+      initCamera();
+    };
 
-            // Hitung tinggi strip berdasarkan 4 foto
-            const photoWidth = 150;
-            const photoHeight = photoWidth * (video.videoHeight / video.videoWidth);
-            const totalHeight = (4 * photoHeight) + (3 * photoSpacing) + 40;
-            stripCanvas.width = stripWidth;
-            stripCanvas.height = totalHeight;
+    // Simpan strip
+    save.onclick = () => {
+      console.log("Menyimpan strip...");
+      const link = document.createElement("a");
+      link.download = `${name1}_${name2}_fotobox.png`;
+      link.href = stripCanvas.toDataURL("image/png", 1.0);
+      link.click();
+    };
 
-            // Background strip (custom warna + opasitas)
-            ctx.fillStyle = stripColorInput.value;
-            ctx.globalAlpha = backgroundOpacity;
-            ctx.fillRect(0, 0, stripWidth, totalHeight);
-            ctx.globalAlpha = 1;
-
-            // Pola samping (custom tipe dan warna)
-            ctx.fillStyle = patternColorInput.value;
-            const pattern = patternTypeSelect.value;
-            for (let y = 20; y < totalHeight; y += 60) {
-                if (pattern === "star") drawStar(ctx, 10, y, patternSize, 5);
-                else if (pattern === "heart") drawHeart(ctx, 10, y, patternSize);
-                else if (pattern === "circle") drawCircle(ctx, 10, y, patternSize);
-                else if (pattern === "triangle") drawTriangle(ctx, 10, y, patternSize);
-                else if (pattern === "diamond") drawDiamond(ctx, 10, y, patternSize);
-                else if (pattern === "flower") drawFlower(ctx, 10, y, patternSize);
-                else if (pattern === "cross") drawCross(ctx, 10, y, patternSize);
-
-                if (pattern === "star") drawStar(ctx, stripWidth - 10, y, patternSize, 5);
-                else if (pattern === "heart") drawHeart(ctx, stripWidth - 10, y, patternSize);
-                else if (pattern === "circle") drawCircle(ctx, stripWidth - 10, y, patternSize);
-                else if (pattern === "triangle") drawTriangle(ctx, stripWidth - 10, y, patternSize);
-                else if (pattern === "diamond") drawDiamond(ctx, stripWidth - 10, y, patternSize);
-                else if (pattern === "flower") drawFlower(ctx, stripWidth - 10, y, patternSize);
-                else if (pattern === "cross") drawCross(ctx, stripWidth - 10, y, patternSize);
-            }
-
-            // Pernak-pernik (custom tipe dan warna)
-            ctx.fillStyle = confettiColorInput.value;
-            const confetti = confettiTypeSelect.value;
-            for (let i = 0; i < 30; i++) {
-                const x = Math.random() * 30 + (Math.random() < 0.5 ? 0 : (stripWidth - 30));
-                const y = Math.random() * totalHeight;
-                if (confetti === "circle") drawCircle(ctx, x, y, confettiSize);
-                else if (confetti === "square") drawSquare(ctx, x, y, confettiSize * 1.5);
-                else if (confetti === "star") drawStar(ctx, x, y, confettiSize * 2, 5);
-                else if (confetti === "heart") drawHeart(ctx, x, y, confettiSize);
-                else if (confetti === "flower") drawFlower(ctx, x, y, confettiSize);
-                else if (confetti === "sparkle") drawSparkle(ctx, x, y, confettiSize);
-                else if (confetti === "drop") drawDrop(ctx, x, y, confettiSize);
-            }
-
-            // Tempel foto (proporsional dengan spasi + rotasi)
-            console.log("Menggambar foto...");
-            const startY = 20;
-            const photoX = (stripWidth - photoWidth) / 2;
-            for (let i = 0; i < 4; i++) {
-                ctx.save();
-
-                const y = startY + (photoHeight + photoSpacing) * i + photoHeight / 2;
-                ctx.translate(photoX + (photoWidth / 2), y);
-
-                ctx.rotate(photoRotations[i] * Math.PI / 180);
-
-                ctx.drawImage(photos[i], -photoWidth / 2, -photoHeight / 2, photoWidth, photoHeight);
-
-                ctx.restore();
-            }
-        }
-
-        // Fungsi gambar pola
-        function drawStar(ctx, x, y, r, points) {
-            ctx.beginPath();
-            for (let i = 0; i < points * 2; i++) {
-                const angle = (Math.PI / points) * i;
-                const radius = i % 2 === 0 ? r : r / 2;
-                ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
-            }
-            ctx.closePath();
-            ctx.fill();
-        }
-
-       function drawHeart(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.bezierCurveTo(x + size / 4, y - size / 2, x + size, y - size / 8, x, y + size / 2);
-            ctx.bezierCurveTo(x - size, y - size / 8, x - size / 4, y - size / 2, x, y);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawCircle(ctx, x, y, r) {
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        function drawTriangle(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y - size / 2);
-            ctx.lineTo(x - size / 2, y + size / 2);
-            ctx.lineTo(x + size / 2, y + size / 2);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawDiamond(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y - size / 2);
-            ctx.lineTo(x - size / 2, y);
-            ctx.lineTo(x, y + size / 2);
-            ctx.lineTo(x + size / 2, y);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawFlower(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.arc(x - size / 2, y - size / 2, size / 4, 0, 2 * Math.PI);
-            ctx.arc(x + size / 2, y - size / 2, size / 4, 0, 2 * Math.PI);
-            ctx.arc(x - size / 2, y + size / 2, size / 4, 0, 2 * Math.PI);
-            ctx.arc(x + size / 2, y + size / 2, size / 4, 0, 2 * Math.PI);
-            ctx.arc(x, y, size / 3, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-
-        function drawCross(ctx, x, y, size) {
-            ctx.fillRect(x - size / 6, y - size / 2, size / 3, size);
-            ctx.fillRect(x - size / 2, y - size / 6, size, size / 3);
-        }
-
-        function drawSparkle(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y - size / 2);
-            ctx.lineTo(x + size / 4, y - size / 4);
-            ctx.lineTo(x + size / 2, y);
-            ctx.lineTo(x + size / 4, y + size / 4);
-            ctx.lineTo(x, y + size / 2);
-            ctx.lineTo(x - size / 4, y + size / 4);
-            ctx.lineTo(x - size / 2, y);
-            ctx.lineTo(x - size / 4, y - size / 4);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawDrop(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y - size / 2);
-            ctx.bezierCurveTo(x + size / 4, y - size / 4, x + size / 2, y + size / 4, x, y + size / 2);
-            ctx.bezierCurveTo(x - size / 2, y + size / 4, x - size / 4, y - size / 4, x, y - size / 2);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        // Ulang foto
-        retry.onclick = () => {
-            console.log("Mengulang sesi foto...");
-            cameraContainer.classList.remove("hidden");
-            resultContainer.classList.add("hidden");
-            initCamera();
-        };
-
-        // Simpan strip
-        save.onclick = () => {
-            console.log("Menyimpan strip...");
-            const link = document.createElement("a");
-            link.download = `${name1}_${name2}_fotobox.png`;
-            link.href = stripCanvas.toDataURL("image/png", 1.0);
-            link.click();
-        };
-
-        // Bintang animasi latar
-        const starsContainer = document.getElementById("stars");
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement("div");
-            star.classList.add("star");
-            star.style.width = `${Math.random() * 3}px`;
-            star.style.height = star.style.width;
-            star.style.top = `${Math.random() * 100}%`;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 3}s`;
-            starsContainer.appendChild(star);
-        }
-    </script>
+    // Bintang animasi latar
+    const starsContainer = document.getElementById("stars");
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement("div");
+      star.classList.add("star");
+      star.style.width = `${Math.random() * 3}px`;
+      star.style.height = star.style.width;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.animationDelay = `${Math.random() * 3}s`;
+      starsContainer.appendChild(star);
+    }
+  </script>
 </body>
+
 </html>
