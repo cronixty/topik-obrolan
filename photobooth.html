@@ -99,14 +99,12 @@
       position: relative;
     }
 
-    /* Memusatkan tampilan pratinjau kamera */
     #video {
       transform: scaleX(-1);
       margin: 0 auto;
       display: block;
     }
 
-    /*Penghitung Waktu Mundur di Dalam Kotak Pratinjau*/
     #countdown {
       position: absolute;
       top: 10px;
@@ -118,13 +116,10 @@
       padding: 0.2rem 0.5rem;
       border-radius: 5px;
       z-index: 10;
-      /*Pastikan terlihat di atas video*/
     }
 
-    /*Memindahkan Tombol ke Bawah Kotak Pratinjau*/
     #start {
       margin-top: 1rem;
-      /*Tambahkan jarak di atas tombol*/
     }
 
     #flash {
@@ -178,7 +173,6 @@
     <h1 class="text-xl font-bold mb-1 text-pink-300">Foto Studio</h1>
     <div id="cameraContainer" class="mb-1 relative">
       <video id="video" width="320" height="240" autoplay class="rounded-lg mb-1"></video>
-      <!-- PENTING: countdown sekarang di dalam cameraContainer -->
       <div id="countdown"></div>
       <button id="start" class="bg-blue-400 text-white p-1 rounded hover:bg-blue-500 w-full text-sm">Mulai Foto</button>
     </div>
@@ -288,7 +282,6 @@
       <button id="save" class="bg-green-400 text-white p-1 rounded hover:bg-green-500 mt-1 w-full text-sm">Simpan</button>
       <button onclick="window.location.href='welcome.html'"
         class="bg-gray-400 text-white p-1 rounded hover:bg-gray-500 w-full text-sm mt-1">Kembali</button>
-      <!-- TOMBOL KEMBALI DIPINDAHKAN KE PALING BAWAH-->
     </div>
   </div>
 
@@ -297,7 +290,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       Coloris({
         el: '.coloris',
-        themeMode: 'dark', // opsional
+        themeMode: 'dark',
         format: 'hex'
       });
     });
@@ -321,7 +314,6 @@
     let stream;
     let photos = [];
 
-    // Variabel kontrol edit (inisialisasi di sini, tapi event listener nanti)
     const stripWidthSlider = document.getElementById("stripWidth");
     const backgroundOpacitySlider = document.getElementById("backgroundOpacity");
     const photoSpacingSlider = document.getElementById("photoSpacing");
@@ -349,7 +341,6 @@
     name1El.textContent = name1;
     name2El.textContent = name2;
 
-    // Akses kamera tanpa mirror
     async function initCamera() {
       try {
         console.log("Mencoba akses kamera...");
@@ -369,7 +360,6 @@
     }
     initCamera();
 
-    // Ambil foto dengan resolusi tinggi
     function takePhoto() {
       console.log("Mengambil foto...");
       const canvas = document.createElement("canvas");
@@ -380,7 +370,6 @@
       return canvas;
     }
 
-    // Animasi flash
     function flash() {
       console.log("Flash!");
       flashEl.style.animation = "flashEffect 0.2s ease";
@@ -389,7 +378,6 @@
       }, 200);
     }
 
-    // Hitung mundur dan potret
     function countdownAndSnap(count) {
       return new Promise(resolve => {
         console.log(`Mulai hitung mundur untuk foto ${count}...`);
@@ -435,39 +423,51 @@
       startBtn.disabled = false;
       console.log("Sesi foto selesai.");
 
-      const editElements = [
-        stripWidthSlider, backgroundOpacitySlider, photoSpacingSlider,
-        patternTypeSelect, patternColorInput, confettiTypeSelect,
-        confettiColorInput, patternSizeSlider, confettiSizeSlider,
-        stripColorInput,
-        ...photoRotationSliders // Gabungkan array rotasi
-      ];
-
-      editElements.forEach(element => {
-        element.addEventListener('input', renderStrip);
-        element.addEventListener('change', renderStrip);
+      stripWidthSlider.addEventListener('input', () => {
+        stripWidth = parseInt(stripWidthSlider.value);
+        renderStrip();
       });
-
+      backgroundOpacitySlider.addEventListener('input', () => {
+        backgroundOpacity = parseFloat(backgroundOpacitySlider.value);
+        renderStrip();
+      });
+      photoSpacingSlider.addEventListener('input', () => {
+        photoSpacing = parseInt(photoSpacingSlider.value);
+        renderStrip();
+      });
+      patternSizeSlider.addEventListener('input', () => {
+        patternSize = parseInt(patternSizeSlider.value);
+        renderStrip();
+      });
+      confettiSizeSlider.addEventListener('input', () => {
+        confettiSize = parseInt(confettiSizeSlider.value);
+        renderStrip();
+      });
+      photoRotationSliders.forEach((slider, index) => {
+        slider.addEventListener('input', () => {
+          photoRotations[index] = parseFloat(slider.value);
+          renderStrip();
+        });
+      });
+      [patternTypeSelect, patternColorInput, confettiTypeSelect, confettiColorInput, stripColorInput].forEach(element => {
+        element.addEventListener('input', renderStrip);
+      });
     };
 
-    // Render strip dengan custom design
     function renderStrip() {
       const ctx = stripCanvas.getContext("2d");
 
-      // Hitung tinggi strip berdasarkan 4 foto
       const photoWidth = 150;
       const photoHeight = photoWidth * (video.videoHeight / video.videoWidth);
       const totalHeight = (4 * photoHeight) + (3 * photoSpacing) + 40;
       stripCanvas.width = stripWidth;
       stripCanvas.height = totalHeight;
 
-      // Background strip (custom warna + opasitas)
       ctx.fillStyle = stripColorInput.value;
       ctx.globalAlpha = backgroundOpacity;
       ctx.fillRect(0, 0, stripWidth, totalHeight);
       ctx.globalAlpha = 1;
 
-      // Pola samping (custom tipe dan warna)
       const pattern = patternTypeSelect.value;
       if (pattern !== "none") {
         ctx.fillStyle = patternColorInput.value;
@@ -490,7 +490,6 @@
         }
       }
 
-      // Pernak-pernik (custom tipe dan warna)
       const confetti = confettiTypeSelect.value;
       if (confetti !== "none") {
         ctx.fillStyle = confettiColorInput.value;
@@ -507,7 +506,6 @@
         }
       }
 
-      // Tempel foto (proporsional dengan spasi + rotasi)
       console.log("Menggambar foto...");
       const startY = 20;
       const photoX = (stripWidth - photoWidth) / 2;
@@ -525,7 +523,6 @@
       }
     }
 
-    // Fungsi gambar pola
     function drawStar(ctx, x, y, r, points) {
       ctx.beginPath();
       for (let i = 0; i < points * 2; i++) {
@@ -586,6 +583,10 @@
       ctx.fillRect(x - size / 2, y - size / 6, size, size / 3);
     }
 
+    function drawSquare(ctx, x, y, size) {
+      ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    }
+
     function drawSparkle(ctx, x, y, size) {
       ctx.beginPath();
       ctx.moveTo(x, y - size / 2);
@@ -609,7 +610,6 @@
       ctx.fill();
     }
 
-    // Ulang foto
     retry.onclick = () => {
       console.log("Mengulang sesi foto...");
       cameraContainer.classList.remove("hidden");
@@ -617,7 +617,6 @@
       initCamera();
     };
 
-    // Simpan strip
     save.onclick = () => {
       console.log("Menyimpan strip...");
       const link = document.createElement("a");
@@ -626,7 +625,6 @@
       link.click();
     };
 
-    // Bintang animasi latar
     const starsContainer = document.getElementById("stars");
     for (let i = 0; i < 100; i++) {
       const star = document.createElement("div");
